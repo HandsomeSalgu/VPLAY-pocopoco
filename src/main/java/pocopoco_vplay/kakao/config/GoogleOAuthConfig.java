@@ -9,7 +9,7 @@ public class GoogleOAuthConfig {
     private final Dotenv dotenv;
 
     public GoogleOAuthConfig() {
-        dotenv = Dotenv.configure().directory("src/main/resources").load();
+        dotenv = Dotenv.configure().load();
     }
 
     public String getClientId() {

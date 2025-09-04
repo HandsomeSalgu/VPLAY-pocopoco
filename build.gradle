@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.2'
 	id 'io.spring.dependency-management' version '1.1.7'
-    id 'war'
+   	// id 'war'
 }
 
 
@@ -64,9 +64,4 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
-}
-
-bootWar {
-    archiveBaseName = 'demoproject'  // 여기 공백 대입이 deprecated 되었을 가능성
-    archiveVersion = "0.0.1-SNAPSHOT"  // 이렇게 변경
 }
