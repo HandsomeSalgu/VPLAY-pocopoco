@@ -35,7 +35,10 @@
 
 	<select id="selectCategoryMyProjects">
 		SELECT c.CONTENT_NO,CONTENT_TITLE,c.CREATE_DATE,c.MODIFY_DATE,c.CONTENT_STATUS,c.DELETE_STATUS,c.USER_NO,c.VIEWS,c.MD_RECOMMENDATION, b.board_type, m.menu_name, m.menu_no,
-		(SELECT COUNT(*) FROM likes WHERE likes.content_no = c.content_no) AS like_count, LISTAGG(ccc.category_name, ',') WITHIN GROUP (ORDER BY ccc.category_name) AS category_name
+		(SELECT COUNT(*) FROM likes WHERE likes.content_no = c.content_no) AS like_count, 
+		<!--  LISTAGG(ccc.category_name, ',') WITHIN GROUP (ORDER BY ccc.category_name)-->
+		GROUP_CONCAT(ccc.category_name ORDER BY ccc.category_name SEPARATOR ',')
+		AS category_name
 		FROM content c
 		left JOIN board b ON c.content_no = b.content_no
 		left JOIN content_category cc on c.content_no = cc.content_no
@@ -76,7 +79,10 @@
 	<select id="selectMyTrash">
 		select c.CONTENT_NO,CONTENT_TITLE,c.CREATE_DATE,c.MODIFY_DATE,c.CONTENT_STATUS,c.DELETE_STATUS,c.USER_NO,c.VIEWS,
         	   c.MD_RECOMMENDATION,(SELECT COUNT(*) FROM likes WHERE likes.content_no = c.content_no) AS like_count , 
-        	   b.board_type,m.menu_name, LISTAGG(ccc.category_name, ',') WITHIN GROUP (ORDER BY ccc.category_name) AS category_name
+        	   b.board_type,m.menu_name, 
+        	   <!--  LISTAGG(ccc.category_name, ',') WITHIN GROUP (ORDER BY ccc.category_name) -->
+        	   GROUP_CONCAT(ccc.category_name ORDER BY ccc.category_name SEPARATOR ',')
+        	   AS category_name
 		from content c
 		left join board b on c.content_no = b.content_no
 		left JOIN content_category cc on c.content_no = cc.content_no
@@ -120,7 +126,10 @@
 		select *
 		from (
 			select 
-			LISTAGG(cg.category_name, ',') WITHIN GROUP (ORDER BY cg.category_name) AS category_name, c.content_no, c.content_title, u.user_nickname,m.menu_no, m.menu_name,
+			<!-- LISTAGG(cg.category_name, ',') WITHIN GROUP (ORDER BY cg.category_name)  -->
+			GROUP_CONCAT(cg.category_name ORDER BY cg.category_name SEPARATOR ',')
+			AS category_name, 
+			c.content_no, c.content_title, u.user_nickname,m.menu_no, m.menu_name,
 			(select count(*) from likes lk where lk.content_no = c.content_no) as like_count, (select count(*) from downloads d where d.content_no = c.content_no) AS download_count
 			from content c
 			left join users u on(c.user_no = u.user_no)
@@ -137,42 +146,35 @@
 			</foreach>
 		</if>
 		<if test="search != null">
-			and CONTENT_TITLE like '%' || #{search} || '%'
+			and c.content_title like CONCAT('%', #{search}, '%')
 		</if>
 		group by c.content_no, c.content_title, u.user_nickname, m.menu_no, m.menu_name
-		order by c.content_no desc)
+		order by c.content_no desc
 		<if test="menuNameNum == 'video Templates'">
-			where rownum <![CDATA[<]]>=
-			3
+			LIMIT 3
 		</if>
 		<if test="menuNameNum == 'Music'">
-			where rownum <![CDATA[<]]>=
-			6
+			LIMIT 6
 		</if>
 		<if test="menuNameNum == 'Sound Effects'">
-			where rownum <![CDATA[<]]>=
-			6
+			LIMIT 6
 		</if>
 		<if test="menuNameNum == 'Graphic Templates'">
-			where rownum <![CDATA[<]]>=
-			3
+			LIMIT 3
 		</if>
 		<if test="menuNameNum == 'Stock Video'">
-			where rownum <![CDATA[<]]>=
-			3
+			LIMIT 3
 		</if>
 		<if test="menuNameNum == 'Photos'">
-			where rownum <![CDATA[<]]>=
-			3
+			LIMIT 3
 		</if>
 		<if test="menuNameNum == 'Fonts'">
-			where rownum <![CDATA[<]]>=
-			6
+			LIMIT 6
 		</if>
 		<if test="recentList != null">
-			where rownum <![CDATA[<]]>=
-			6
+			LIMIT 6
 		</if>
+		) as t
 	</select>
 
 	<select id="menuLikeTo">
@@ -202,29 +204,26 @@
 		ORDER BY create_date DESC
 	</select>
 
-	<insert id="insertInquiry" parameterType="Content">
-		<selectKey resultType="int" keyProperty="contentNo" order="BEFORE">
-			SELECT VPLAY.CONTENT_SEQ.NEXTVAL FROM DUAL
-		</selectKey>
-		INSERT INTO CONTENT (
-		CONTENT_NO,USER_NO,
-		CONTENT_TITLE,
-		CONTENT_DETAIL,
-		CREATE_DATE,
-		MODIFY_DATE,
-		CONTENT_STATUS,
-		VIEWS
-		) VALUES (
-		#{contentNo},
-		#{userNo},
-		#{contentTitle},
-		#{contentDetail},
-		SYSDATE,
-		SYSDATE,
-		'Y',
-		0
-		)
+	<insert id="insertInquiry" parameterType="Content" useGeneratedKeys="true" keyProperty="contentNo">
+	    INSERT INTO content (
+	        user_no,
+	        content_title,
+	        content_detail,
+	        create_date,
+	        modify_date,
+	        content_status,
+	        views
+	    ) VALUES (
+	        #{userNo},
+	        #{contentTitle},
+	        #{contentDetail},
+	        CURRENT_TIMESTAMP,
+	        CURRENT_TIMESTAMP,
+	        'Y',
+	        0
+	    )
 	</insert>
+
 
 	<insert id="insertBoard">
 		INSERT INTO BOARD (
@@ -243,7 +242,7 @@
 		SET
 		CONTENT_TITLE = #{contentTitle},
 		CONTENT_DETAIL = #{contentDetail},
-		MODIFY_DATE = SYSDATE
+		MODIFY_DATE = CURRENT_TIMESTAMP
 		WHERE
 		CONTENT_NO = #{contentNo}
 	</update>
@@ -335,13 +334,28 @@
 		where user_no = #{userNo}
 	</select>
 
-	<insert id="insertRequest">
-		<selectKey resultType="_int" keyProperty="contentNo" order="BEFORE">
-			SELECT VPLAY.CONTENT_SEQ.NEXTVAL FROM DUAL
-		</selectKey>
-		INSERT INTO content (content_no, content_title, content_detail, create_date, modify_date, content_status, delete_status, user_no, views)
-		VALUES (#{contentNo}, #{contentTitle}, #{contentDetail}, SYSDATE, SYSDATE, DEFAULT, DEFAULT, #{userNo}, DEFAULT)
+	<insert id="insertRequest" parameterType="Content" useGeneratedKeys="true" keyProperty="contentNo">
+	    INSERT INTO content (
+	        content_title,
+	        content_detail,
+	        create_date,
+	        modify_date,
+	        content_status,
+	        delete_status,
+	        user_no,
+	        views
+	    ) VALUES (
+	        #{contentTitle},
+	        #{contentDetail},
+	        CURRENT_TIMESTAMP,
+	        CURRENT_TIMESTAMP,
+	        DEFAULT,
+	        DEFAULT,
+	        #{userNo},
+	        DEFAULT
+	    )
 	</insert>
+
 
 	<insert id="insertRequestBoard">
 		insert into board (CONTENT_NO, BOARD_TYPE, MENU_NO)
@@ -382,7 +396,8 @@
 		  m.menu_name,
 		  m.menu_no,
 		  (
-		    select listagg(category_name, ',') within group(order by category_name)
+		    select <!-- listagg(category_name, ',') within group(order by category_name) -->
+		    GROUP_CONCAT(category_name ORDER BY category_name SEPARATOR ',')
 		    from content_category cc
 		    join category cg on cc.category_no = cg.category_no
 		    where cc.content_no = c.content_no
@@ -395,7 +410,7 @@
 		    from content_category cc
 		    join category cg on cc.category_no = cg.category_no
 		    where cc.content_no = c.content_no
-		    fetch first 1 row only
+		    LIMIT 12
 		  )
 		)
 		where c.content_no = #{contentNo}
@@ -434,7 +449,7 @@
 	<update id="updateRequest">
 		UPDATE content
 		SET content_title = #{contentTitle},
-		modify_date = SYSDATE,
+		modify_date = CURRENT_TIMESTAMP,
 		content_detail = #{contentDetail}
 		WHERE content_no = #{contentNo}
 	</update>
@@ -472,24 +487,24 @@
 		GROUP BY c.content_no, c.content_title, c.create_date,
 		c.modify_date, c.user_no, c.views, u.user_nickname, u.user_nickname, m.menu_no, m.menu_name
 		ORDER BY c.views DESC
-		fetch first 12 rows only
+		LIMIT 12
 	</select>
 
 
 	<select id="selectOrderByViews">
 		select * from content order by views desc
-		fetch first 12 rows only
+		LIMIT 12
 	</select>
 
 	<insert id="insertReply">
-		insert into reply
-		values(REPLY_SEQ.nextval,#{replyDetail},sysdate,sysdate,'Y', #{contentNo},#{userNo})
+		insert into reply(REPLY_DETAIL, CREATE_DATE, MODIFY_DATE, REPLY_STATUS, CONTENT_NO, USER_NO)
+		values(#{replyDetail},CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,'Y', #{contentNo},#{userNo})
 	</insert>
 
 	<update id="updateReply">
 		UPDATE reply
 		SET reply_detail = #{replyDetail},
-			modify_date = SYSDATE
+			modify_date = CURRENT_TIMESTAMP
 		WHERE reply_no = #{replyNo}
 		  AND user_no = #{userNo}
 	</update>
@@ -525,32 +540,32 @@
 	</select>
 	
 	<!-- 컨텐츠 글 등록 -->
-	<insert id="insertContent">
-		<selectKey resultType="_int" keyProperty="contentNo" order="BEFORE">
-			SELECT VPLAY.CONTENT_SEQ.NEXTVAL FROM DUAL
-		</selectKey>
-		insert into content
-		values(#{contentNo}, #{contentTitle}, #{contentDetail}, default, default, default, default, #{userNo}, default, default)
+	<insert id="insertContent" useGeneratedKeys="true" keyProperty="contentNo">
+  	INSERT INTO content
+     	(content_title, content_detail, create_date, modify_date, content_status, delete_status, user_no, views, md_recommendation)
+  	VALUES
+     	(#{contentTitle}, #{contentDetail}, DEFAULT, DEFAULT, DEFAULT, DEFAULT, #{userNo}, DEFAULT, DEFAULT)
 	</insert>
+
 	
 	<!-- 컨텐츠 글 카테고리 등록 -->
 	<insert id="insertContentCategory">
-		insert all
+		INSERT INTO content_category (content_no, category_no)
+  		VALUES
 		<foreach collection="categoryNo" item="no" separator=" ">
-			into content_category 
-			values(#{contentNo}, #{no})
+			(#{contentNo}, #{no})
 		</foreach>
 		select * from dual
 	</insert>
 	
 	<insert id="insertThumbnailFile">
-		insert into Files
-		values(file_seq.nextval, #{contentNo}, #{tFileUrl}, default, 1, #{tFileOriginalName} )
+		insert into Files(REF_CONTENT_NO, FILE_LOCATION, FILE_STATUS, FILE_LEVEL, ORIGINAL_FILE_NAME)
+		values(#{contentNo}, #{tFileUrl}, default, 1, #{tFileOriginalName} )
 	</insert>
 	
 	<insert id="insertContentFile">
-		insert into Files
-		values(file_seq.nextval, #{contentNo}, #{cFileUrl}, default, 2, #{cFileOriginalName})
+		insert into Files(REF_CONTENT_NO, FILE_LOCATION, FILE_STATUS, FILE_LEVEL, ORIGINAL_FILE_NAME)
+		values(#{contentNo}, #{cFileUrl}, default, 2, #{cFileOriginalName})
 	</insert>
 
 	<update id="updateRecommendation">
@@ -567,7 +582,9 @@
 		select *
 		from (
 			select 
-			LISTAGG(cg.category_name, ',') WITHIN GROUP (ORDER BY cg.category_name) AS category_name, c.content_no, c.content_title, u.user_nickname,m.menu_no, 
+			<!-- LISTAGG(cg.category_name, ',') WITHIN GROUP (ORDER BY cg.category_name) -->
+			GROUP_CONCAT(cg.category_name ORDER BY cg.category_name SEPARATOR ',') AS category_name
+			AS category_name, c.content_no, c.content_title, u.user_nickname,m.menu_no, 
 			(select count(*) from likes lk where lk.content_no = c.content_no) as like_count, (select count(*) from downloads d where d.content_no = c.content_no) AS download_count
 			from content c
 			left join users u on(c.user_no = u.user_no)
@@ -587,13 +604,13 @@
 	</select>
 	
 	<insert id="downloadRecord">
-		insert into downloads
-		values(DOWNLOADS_SEQ.nextval, #{userNo}, #{contentNo})
+		insert into downloads(USER_NO, CONTENT_NO)
+		values(#{userNo}, #{contentNo})
 	</insert>
 	
 	<update id="updateContent">
 		update content
-		set content_title = #{contentTitle}, content_detail = #{contentDetail}, modify_date = sysdate
+		set content_title = #{contentTitle}, content_detail = #{contentDetail}, modify_date = CURRENT_TIMESTAMP
 		where content_no = #{contentNo}
 	</update>
 	
@@ -635,8 +652,9 @@
 		    b.board_type,
 		    m.menu_name, m.menu_no,
 		    (
-		        SELECT LISTAGG(cg.category_name, ',') 
-		               WITHIN GROUP (ORDER BY cg.category_name)
+		        SELECT 
+		        <!-- LISTAGG(cg.category_name, ',') WITHIN GROUP (ORDER BY cg.category_name) -->
+		        GROUP_CONCAT(cg.category_name ORDER BY cg.category_name SEPARATOR ',')
 		        FROM content_category cc
 		        JOIN category cg ON cc.category_no = cg.category_no
 		        WHERE cc.content_no = c.content_no
@@ -650,7 +668,7 @@
 		    FROM content_category cc
 		    JOIN category cg ON cc.category_no = cg.category_no
 		    WHERE cc.content_no = c.content_no
-		    FETCH FIRST 1 ROWS ONLY
+		    LIMIT 1
 		) = m.menu_no
 		WHERE d.user_no = #{userNo}
 		  AND b.board_type IS NULL
