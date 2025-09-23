@@ -15,8 +15,8 @@
 	</select>
 
 	<insert id="insertUser">
-		insert into users (USER_NO, USER_ID, USER_PW, USER_NICKNAME, USER_NAME, USER_PHONE, USER_EMAIL, USER_BIRTH, USER_GENDER, STATUS, IS_ADMIN, JOIN_DATE, USER_COMMENT, USER_CREATOR_RANK, USER_PLAN, USER_PROFILE, LOGIN_TYPE, KAKAO_ID
-		) values (user_seq.nextval, #{userId}, #{userPw}, #{userNickname}, #{userName}, #{userPhone}, #{userEmail}, #{userBirth}, #{userGender}, 'Y', 'N', sysdate, default, default, default, default, #{loginType},#{kakaoId})
+		insert into users (USER_ID, USER_PW, USER_NICKNAME, USER_NAME, USER_PHONE, USER_EMAIL, USER_BIRTH, USER_GENDER, STATUS, IS_ADMIN, JOIN_DATE, USER_COMMENT, USER_CREATOR_RANK, USER_PLAN, USER_PROFILE, LOGIN_TYPE, KAKAO_ID
+		) values (#{userId}, #{userPw}, #{userNickname}, #{userName}, #{userPhone}, #{userEmail}, #{userBirth}, #{userGender}, 'Y', 'N', CURRENT_TIMESTAMP, default, default, default, default, #{loginType},#{kakaoId})
 	</insert>
 
 	<select id="selectMyProject">
@@ -37,7 +37,7 @@
 	<select id="selectMyRealProjects">
 		select c.CONTENT_NO,CONTENT_TITLE,c.CREATE_DATE,c.MODIFY_DATE,c.CONTENT_STATUS,c.DELETE_STATUS,c.USER_NO,c.VIEWS,
 		c.MD_RECOMMENDATION,(SELECT COUNT(*) FROM likes WHERE likes.content_no = c.content_no) AS like_count ,
-		b.board_type,m.menu_name, LISTAGG(ccc.category_name, ',') WITHIN GROUP (ORDER BY ccc.category_name) AS category_name, m.menu_no
+		b.board_type,m.menu_name, GROUP_CONCAT(ccc.category_name ORDER BY ccc.category_name SEPARATOR ',') AS category_name, m.menu_no
 		from content c
 		left join board b on c.content_no = b.content_no
 		left JOIN content_category cc on c.content_no = cc.content_no
@@ -137,7 +137,7 @@
 			 U.USER_COMMENT,
 			 u.user_profile
 		order by subscriber desc
-		fetch first 12 rows only
+		LIMIT 12
 	</select>
 
 	<update id="updateUserPlan">
@@ -148,7 +148,7 @@
 	<select id="getPaymentDate">
 		select payment_date from users join payment using(user_no)
 		where user_no=#{userNo} order by payment_date desc
-		fetch first 1 row only
+		LIMIT 1
 	</select>
 	<update id="deleteUserPlan">
 		update users
@@ -208,18 +208,14 @@
 		select count(*) from users where user_nickname=#{receiverName}
 	</select>
 	<insert id="insertMessage">
-		INSERT INTO MESSAGE (MESSAGE_NO, SENDER_NO, RECEIVER_NO, CONTENT, SENT_TIME, READ_STATUS, CONVERSATION_ID)
+		INSERT INTO MESSAGE (SENDER_NO, RECEIVER_NO, CONTENT, SENT_TIME, READ_STATUS, CONVERSATION_ID)
 		VALUES (
-		MESSAGE_SEQ.NEXTVAL,
 		#{senderNo},
 		#{receiverNo},
 		#{content},
-		SYSTIMESTAMP,
+		CURRENT_TIMESTAMP,
 		default,
-		(CASE
-		WHEN #{senderNo} &lt; #{receiverNo} THEN #{senderNo} || '_' || #{receiverNo}
-		ELSE #{receiverNo} || '_' || #{senderNo}
-		END)
+		CONCAT(LEAST(#{senderNo}, #{receiverNo}), '_', GREATEST(#{senderNo}, #{receiverNo}))
 		)
 	</insert>
 	<select id="getReceiverNo">
@@ -244,8 +240,7 @@
 		b.board_type,
 		m.menu_name, m.menu_no,
 		(
-		SELECT LISTAGG(cg.category_name, ',')
-		WITHIN GROUP (ORDER BY cg.category_name)
+		SELECT GROUP_CONCAT(cg.category_name ORDER BY cg.category_name SEPARATOR ',')
 		FROM content_category cc
 		JOIN category cg ON cc.category_no = cg.category_no
 		WHERE cc.content_no = c.content_no
@@ -259,7 +254,7 @@
 		FROM content_category cc
 		JOIN category cg ON cc.category_no = cg.category_no
 		WHERE cc.content_no = c.content_no
-		FETCH FIRST 1 ROWS ONLY
+		LIMIT 1
 		) = m.menu_no
 		WHERE d.user_no = #{userNo}
 		AND b.board_type IS NULL
@@ -298,8 +293,8 @@
 	              AND user_no = #{userNo}
 	        </when>
 	        <otherwise>
-	            INSERT INTO subscribe
-	            VALUES (subscribe_seq.nextval, #{createrNo}, #{userNo})
+	            INSERT INTO subscribe(CREATER_NO, USER_NO)
+	            VALUES (#{createrNo}, #{userNo})
 	        </otherwise>
 	    </choose>
 </insert>

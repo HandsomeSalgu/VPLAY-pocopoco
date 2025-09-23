@@ -13,7 +13,7 @@
 		from users
 
 		<if test="search != null and search != ''">
-			where user_name like '%${search}%'
+			where user_name like CONCAT('%', #{search}, '%')
 		</if>
 	</select>
 
@@ -21,7 +21,7 @@
 		select *
 		from users
 		<if test="search != null and search != ''">
-			where user_name like '%${search}%'
+			where user_name like CONCAT('%', #{search}, '%')
 		</if>
 		order by user_no desc
 	</select>
@@ -35,7 +35,7 @@
 			and menu_no = #{menuNo}
 		</if>
 		<if test="search != null and search != ''">
-			and content_title like '%${search}%'
+			and content_title like CONCAT('%', #{search}, '%')
 		</if>
 	</select>
 
@@ -50,7 +50,7 @@
 			and menu_no = #{menuNo}
 		</if>
 		<if test="search != null and search != ''">
-			and (content_title like '%${search}%' or content_detail like '%${search}%')
+			and (content_title like CONCAT('%', #{search}, '%') or content_detail like CONCAT('%', #{search}, '%'))
 		</if>
 		order by content_no desc
 	</select>
@@ -75,7 +75,6 @@
 	<select id="getTemplatesCount">
 		select count(*)
 		from (select c.content_no, c.content_title, c.create_date, c.modify_date, c.content_status, c.delete_status, c.user_no, c.md_recommendation, m.menu_name,
-		<!--  LISTAGG(cat.category_name, ',') WITHIN GROUP (ORDER BY cat.category_name) AS category_name-->
 		GROUP_CONCAT(cat.category_name ORDER BY cat.category_name SEPARATOR ',') AS category_name
 		from content c
 		left join content_category cc on c.content_no = cc.content_no
@@ -85,11 +84,11 @@
 		select 1
 		FROM board b
 		where c.content_no = b.content_no
-		)
+		) 
 		<if test="menuNo != null">
 			and cat.menu_no = #{menuNo}
 		</if>
-		group by c.content_no, c.content_title, c.create_date, c.modify_date, c.content_status, c.delete_status, c.user_no, c.md_recommendation, m.menu_name)
+		group by c.content_no, c.content_title, c.create_date, c.modify_date, c.content_status, c.delete_status, c.user_no, c.md_recommendation, m.menu_name) as t
 	</select>
 
 	<select id="selectAllTemplates">
@@ -109,7 +108,7 @@
 			and cat.menu_no = #{menuNo}
 		</if>
 		<if test="search != null and search != ''">
-			and (c.content_title like '%${search}%' or c.content_detail like '%${search}%')
+			and (c.content_title like CONCAT('%', #{search}, '%') or c.content_detail like CONCAT('%', #{search}, '%'))
 		</if>
 		group by c.content_no, c.content_title, c.create_date, c.modify_date, c.content_status, c.delete_status, c.user_no, c.md_recommendation, m.menu_name
 		order by
@@ -126,7 +125,7 @@
 			and menu_no = #{menuNo}
 		</if>
 		<if test="search != null and search != ''">
-			and (content_title like '%${search}%' or content_detail like '%${search}%')
+			and (content_title like CONCAT('%', #{search}, '%') or content_detail like CONCAT('%', #{search}, '%'))
 		</if>
 	</select>
 
@@ -140,7 +139,7 @@
 			and menu_no = #{menuNo}
 		</if>
 		<if test="search != null and search != ''">
-			and (content_title like '%${search}%' or content_detail like '%${search}%')
+			and (content_title like CONCAT('%', #{search}, '%') or content_detail like CONCAT('%', #{search}, '%'))
 		</if>
 		order by content_no desc
 	</select>
@@ -176,32 +175,32 @@
 		left join content_category coa on(co.content_no = coa.content_no)
 		left join category ca on(ca.category_no = coa.category_no)
 		left outer join menu me on(ca.menu_no = me.menu_no)
-		where board_type is null and
+		where board_type is null
 		<if test="i == 1">
-			me.menu_no = 1
+			and me.menu_no = 1
 		</if>
 		<if test="i == 2">
-			me.menu_no = 2
+			and me.menu_no = 2
 		</if>
 		<if test="i == 3">
-			me.menu_no = 3
+			and me.menu_no = 3
 		</if>
 		<if test="i == 4">
-			me.menu_no = 4
+			and me.menu_no = 4
 		</if>
 		<if test="i == 5">
-			me.menu_no = 5
+			and me.menu_no = 5
 		</if>
 		<if test="i == 6">
-			me.menu_no = 6
+			and me.menu_no = 6
 		</if>
 		<if test="i == 7">
-			me.menu_no = 7
+			and me.menu_no = 7
 		</if>
 	</select>
 
 	<insert id="insertReply">
-		insert into reply
-		values( #{replyDetail}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Y', #{contentNo}, #{userNo})
+		insert into reply(REPLY_DETAIL, CREATE_DATE, MODIFY_DATE, REPLY_STATUS, CONTENT_NO, USER_NO)
+		values(#{replyDetail}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Y', #{contentNo}, #{userNo})
 	</insert>
 </mapper>

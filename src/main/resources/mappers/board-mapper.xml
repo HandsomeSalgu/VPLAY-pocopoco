@@ -34,7 +34,7 @@
 
 
 	<select id="selectCategoryMyProjects">
-		SELECT c.CONTENT_NO,CONTENT_TITLE,c.CREATE_DATE,c.MODIFY_DATE,c.CONTENT_STATUS,c.DELETE_STATUS,c.USER_NO,c.VIEWS,c.MD_RECOMMENDATION, b.board_type, m.menu_name, m.menu_no,
+		SELECT c.content_NO,content_TITLE,c.CREATE_DATE,c.MODIFY_DATE,c.content_STATUS,c.DELETE_STATUS,c.USER_NO,c.VIEWS,c.MD_RECOMMENDATION, b.board_type, m.menu_name, m.menu_no,
 		(SELECT COUNT(*) FROM likes WHERE likes.content_no = c.content_no) AS like_count, 
 		<!--  LISTAGG(ccc.category_name, ',') WITHIN GROUP (ORDER BY ccc.category_name)-->
 		GROUP_CONCAT(ccc.category_name ORDER BY ccc.category_name SEPARATOR ',')
@@ -49,11 +49,11 @@
 			AND m.menu_name =#{menu}
 		</if>
 		group by 
-	        c.CONTENT_NO,
-	        c.CONTENT_TITLE,
+	        c.content_NO,
+	        c.content_TITLE,
 	        c.CREATE_DATE,
 	        c.MODIFY_DATE,
-	        c.CONTENT_STATUS,
+	        c.content_STATUS,
 	        c.DELETE_STATUS,
 	        c.USER_NO,
 	        c.VIEWS,
@@ -77,7 +77,7 @@
 	</update>
 
 	<select id="selectMyTrash">
-		select c.CONTENT_NO,CONTENT_TITLE,c.CREATE_DATE,c.MODIFY_DATE,c.CONTENT_STATUS,c.DELETE_STATUS,c.USER_NO,c.VIEWS,
+		select c.content_NO,content_TITLE,c.CREATE_DATE,c.MODIFY_DATE,c.content_STATUS,c.DELETE_STATUS,c.USER_NO,c.VIEWS,
         	   c.MD_RECOMMENDATION,(SELECT COUNT(*) FROM likes WHERE likes.content_no = c.content_no) AS like_count , 
         	   b.board_type,m.menu_name, 
         	   <!--  LISTAGG(ccc.category_name, ',') WITHIN GROUP (ORDER BY ccc.category_name) -->
@@ -90,11 +90,11 @@
 		left JOIN menu m ON ccc.menu_no = m.menu_no
 		where c.user_no=#{userNo} and b.board_type is null and m.menu_name is not null and c.content_status='N'
         group by 
-	        c.CONTENT_NO,
-	        c.CONTENT_TITLE,
+	        c.content_NO,
+	        c.content_TITLE,
 	        c.CREATE_DATE,
 	        c.MODIFY_DATE,
-	        c.CONTENT_STATUS,
+	        c.content_STATUS,
 	        c.DELETE_STATUS,
 	        c.USER_NO,
 	        c.VIEWS,
@@ -150,30 +150,16 @@
 		</if>
 		group by c.content_no, c.content_title, u.user_nickname, m.menu_no, m.menu_name
 		order by c.content_no desc
-		<if test="menuNameNum == 'video Templates'">
-			LIMIT 3
-		</if>
-		<if test="menuNameNum == 'Music'">
-			LIMIT 6
-		</if>
-		<if test="menuNameNum == 'Sound Effects'">
-			LIMIT 6
-		</if>
-		<if test="menuNameNum == 'Graphic Templates'">
-			LIMIT 3
-		</if>
-		<if test="menuNameNum == 'Stock Video'">
-			LIMIT 3
-		</if>
-		<if test="menuNameNum == 'Photos'">
-			LIMIT 3
-		</if>
-		<if test="menuNameNum == 'Fonts'">
-			LIMIT 6
-		</if>
-		<if test="recentList != null">
-			LIMIT 6
-		</if>
+		<choose>
+  			<when test="menuNameNum == 'video Templates'">LIMIT 3</when>
+ 			<when test="menuNameNum == 'Music'">LIMIT 6</when>
+ 			<when test="menuNameNum == 'Sound Effects'">LIMIT 6</when>
+ 			<when test="menuNameNum == 'Graphic Templates'">LIMIT 3</when>
+ 			<when test="menuNameNum == 'Stock Video'">LIMIT 3</when>
+ 			<when test="menuNameNum == 'Photos'">LIMIT 3</when>
+ 			<when test="menuNameNum == 'Fonts'">LIMIT 6</when>
+ 			<when test="recentList != 'null'">LIMIT 6</when>
+  		</choose>
 		) as t
 	</select>
 
@@ -226,9 +212,9 @@
 
 
 	<insert id="insertBoard">
-		INSERT INTO BOARD (
-		CONTENT_NO,
-		BOARD_TYPE,
+		INSERT INTO board (
+		content_NO,
+		board_TYPE,
 		MENU_NO
 		) VALUES (
 		#{contentNo},
@@ -238,53 +224,53 @@
 	</insert>
 
 	<update id="updateInquiry" parameterType="Content">
-		UPDATE CONTENT
+		UPDATE content
 		SET
-		CONTENT_TITLE = #{contentTitle},
-		CONTENT_DETAIL = #{contentDetail},
+		content_TITLE = #{contentTitle},
+		content_DETAIL = #{contentDetail},
 		MODIFY_DATE = CURRENT_TIMESTAMP
 		WHERE
-		CONTENT_NO = #{contentNo}
+		content_NO = #{contentNo}
 	</update>
 
 	<update id="updateBoard">
-		UPDATE BOARD
+		UPDATE board
 		SET
 		MENU_NO = #{menuNo}
 		WHERE
-		CONTENT_NO = #{contentNo}
+		content_NO = #{contentNo}
 
 	</update>
 
 	<select id="selectInquiry" resultType="Content">
 		SELECT
-		C.CONTENT_NO,
+		C.content_NO,
 		C.USER_NO,
-		C.CONTENT_TITLE,
-		C.CONTENT_DETAIL,
+		C.content_TITLE,
+		C.content_DETAIL,
 		C.CREATE_DATE,
 		C.MODIFY_DATE,
-		C.CONTENT_STATUS,
+		C.content_STATUS,
 		C.VIEWS,
 		B.MENU_NO
 		FROM
-		CONTENT C
+		content C
 		JOIN
-		BOARD B ON C.CONTENT_NO = B.CONTENT_NO
+		board B ON C.content_NO = B.content_NO
 		WHERE
-		C.CONTENT_NO = #{contentNo}
+		C.content_NO = #{contentNo}
 	</select>
 
 	<select id="selectReply">
-		SELECT REPLY_DETAIL
-		FROM REPLY
-		WHERE CONTENT_NO = #{contentNo}
+		SELECT reply_DETAIL
+		FROM reply
+		WHERE content_NO = #{contentNo}
 	</select>
 
 	<select id="countReply">
 		SELECT count(*)
-		FROM REPLY
-		WHERE CONTENT_NO = #{contentNo}
+		FROM reply
+		WHERE content_NO = #{contentNo}
 	</select>
 
 	<select id="allCategory">
@@ -309,7 +295,7 @@
 			and menu_no = #{menuNo}
 		</if>
 		<if test="search != null and search != ''">
-			and (content_title like '%${search}%' or content_detail like '%${search}%')
+			and (content_title like CONCAT('%', #{search}, '%') or content_detail like CONCAT('%', #{search}, '%'))
 		</if>
 	</select>
 
@@ -323,7 +309,7 @@
 			and menu_no = #{menuNo}
 		</if>
 		<if test="search != null and search != ''">
-			and (content_title like '%${search}%' or content_detail like '%${search}%')
+			and (content_title like CONCAT('%', #{search}, '%') or content_detail like CONCAT('%', #{search}, '%'))
 		</if>
 		order by content_no desc
 	</select>
@@ -358,7 +344,7 @@
 
 
 	<insert id="insertRequestBoard">
-		insert into board (CONTENT_NO, BOARD_TYPE, MENU_NO)
+		insert into board (content_NO, board_TYPE, MENU_NO)
 		values (#{contentNo}, 2, #{menuNo})
 	</insert>
 
@@ -406,11 +392,10 @@
 		join users u on c.user_no = u.user_no
 		join menu m on (
 		  m.menu_no = (
-		    select cg.menu_no
+		    select MIN(cg.menu_no)
 		    from content_category cc
 		    join category cg on cc.category_no = cg.category_no
 		    where cc.content_no = c.content_no
-		    LIMIT 12
 		  )
 		)
 		where c.content_no = #{contentNo}
@@ -497,7 +482,7 @@
 	</select>
 
 	<insert id="insertReply">
-		insert into reply(REPLY_DETAIL, CREATE_DATE, MODIFY_DATE, REPLY_STATUS, CONTENT_NO, USER_NO)
+		insert into reply(reply_DETAIL, CREATE_DATE, MODIFY_DATE, reply_STATUS, content_NO, USER_NO)
 		values(#{replyDetail},CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,'Y', #{contentNo},#{userNo})
 	</insert>
 
@@ -519,7 +504,7 @@
 		join board using(content_no)
 		join menu using(menu_no)
 		join users using(user_no)
-		where menu_no =#{menuNo} and CONTENT_STATUS ='Y'
+		where menu_no =#{menuNo} and content_STATUS ='Y'
 	</select>
 
 	<select id="searchRequest">
@@ -529,7 +514,7 @@
 		join board using(content_no)
 		join menu using(menu_no)
 		<if test="searchValue != null and searchValue.trim() != ''">
-			WHERE content_title LIKE CONCAT(CONCAT('%', #{searchValue}), '%') and board_type = 2 and CONTENT_STATUS = 'Y'
+			WHERE content_title LIKE CONCAT(CONCAT('%', #{searchValue}), '%') and board_type = 2 and content_STATUS = 'Y'
 		</if>
 	</select>
 
@@ -552,19 +537,18 @@
 	<insert id="insertContentCategory">
 		INSERT INTO content_category (content_no, category_no)
   		VALUES
-		<foreach collection="categoryNo" item="no" separator=" ">
+		<foreach collection="categoryNo" item="no" separator=",">
 			(#{contentNo}, #{no})
 		</foreach>
-		select * from dual
 	</insert>
 	
 	<insert id="insertThumbnailFile">
-		insert into Files(REF_CONTENT_NO, FILE_LOCATION, FILE_STATUS, FILE_LEVEL, ORIGINAL_FILE_NAME)
+		insert into files(REF_content_NO, FILE_LOCATION, FILE_STATUS, FILE_LEVEL, ORIGINAL_FILE_NAME)
 		values(#{contentNo}, #{tFileUrl}, default, 1, #{tFileOriginalName} )
 	</insert>
 	
 	<insert id="insertContentFile">
-		insert into Files(REF_CONTENT_NO, FILE_LOCATION, FILE_STATUS, FILE_LEVEL, ORIGINAL_FILE_NAME)
+		insert into files(REF_content_NO, FILE_LOCATION, FILE_STATUS, FILE_LEVEL, ORIGINAL_FILE_NAME)
 		values(#{contentNo}, #{cFileUrl}, default, 2, #{cFileOriginalName})
 	</insert>
 
@@ -583,8 +567,8 @@
 		from (
 			select 
 			<!-- LISTAGG(cg.category_name, ',') WITHIN GROUP (ORDER BY cg.category_name) -->
-			GROUP_CONCAT(cg.category_name ORDER BY cg.category_name SEPARATOR ',') AS category_name
-			AS category_name, c.content_no, c.content_title, u.user_nickname,m.menu_no, 
+			GROUP_CONCAT(cg.category_name ORDER BY cg.category_name SEPARATOR ',') AS category_name,
+			c.content_no, c.content_title, u.user_nickname,m.menu_no, 
 			(select count(*) from likes lk where lk.content_no = c.content_no) as like_count, (select count(*) from downloads d where d.content_no = c.content_no) AS download_count
 			from content c
 			left join users u on(c.user_no = u.user_no)
@@ -594,7 +578,7 @@
 			left join menu m on(cg.menu_no = m.menu_no)
 			left join likes lk2 on (c.content_no = lk2.content_no)
 			where c.md_recommendation = 'Y'
-			group by c.content_no, c.content_title, u.user_nickname, m.menu_no)
+			group by c.content_no, c.content_title, u.user_nickname, m.menu_no) AS t
 	</select>
 	
 	<select id="checkDownload">
@@ -604,7 +588,7 @@
 	</select>
 	
 	<insert id="downloadRecord">
-		insert into downloads(USER_NO, CONTENT_NO)
+		insert into downloads(USER_NO, content_NO)
 		values(#{userNo}, #{contentNo})
 	</insert>
 	
@@ -614,7 +598,7 @@
 		where content_no = #{contentNo}
 	</update>
 	
-	<select id="selectFiles">
+	<select id="selectfiles">
 		select *
 		from files
 		where ref_content_no = #{contentNo}
@@ -639,11 +623,11 @@
 	
 	<select id="selectDownloadsCategorySort">
 		SELECT 
-		    c.CONTENT_NO,
-		    c.CONTENT_TITLE,
+		    c.content_NO,
+		    c.content_TITLE,
 		    c.CREATE_DATE,
 		    c.MODIFY_DATE,
-		    c.CONTENT_STATUS,
+		    c.content_STATUS,
 		    c.DELETE_STATUS,
 		    c.USER_NO,
 		    c.VIEWS,
