@@ -2,59 +2,83 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="pocopoco_vplay.users.model.mapper.UsersMapper">
 	<select id="checkId">
-		select count(*)
-		from users
-		where user_id=#{id}
+		SELECT COUNT(*)
+		FROM USERS
+		WHERE USER_ID=#{id}
 	</select>
 
 	<!-- 로그인 -->
 	<select id="signIn">
-		select *
-		from users
-		where USER_ID = #{userId} and STATUS ='Y'
+		SELECT *
+		FROM USERS
+		WHERE USER_ID = #{userId} AND STATUS ='Y'
 	</select>
 
 	<insert id="insertUser">
-		insert into users (USER_ID, USER_PW, USER_NICKNAME, USER_NAME, USER_PHONE, USER_EMAIL, USER_BIRTH, USER_GENDER, STATUS, IS_ADMIN, JOIN_DATE, USER_COMMENT, USER_CREATOR_RANK, USER_PLAN, USER_PROFILE, LOGIN_TYPE, KAKAO_ID
-		) values (#{userId}, #{userPw}, #{userNickname}, #{userName}, #{userPhone}, #{userEmail}, #{userBirth}, #{userGender}, 'Y', 'N', CURRENT_TIMESTAMP, default, default, default, default, #{loginType},#{kakaoId})
+		INSERT INTO USERS (USER_ID, USER_PW, USER_NICKNAME, USER_NAME, USER_PHONE, USER_EMAIL, USER_BIRTH, USER_GENDER, STATUS, IS_ADMIN, JOIN_DATE, USER_COMMENT, USER_CREATOR_RANK, USER_PLAN, USER_PROFILE, LOGIN_TYPE, KAKAO_ID
+		) VALUES (#{userId}, #{userPw}, #{userNickname}, #{userName}, #{userPhone}, #{userEmail}, #{userBirth}, #{userGender}, 'Y', 'N', CURRENT_TIMESTAMP, DEFAULT, DEFAULT, DEFAULT, DEFAULT, #{loginType},#{kakaoId})
 	</insert>
 
 	<select id="selectMyProject">
 		SELECT
-		c.content_title, c.VIEWS,
-		c.content_no, menu.menu_no, menu.menu_name,
-		(SELECT COUNT(*) FROM likes l2 WHERE l2.content_no = c.content_no) AS like_count
-		FROM content c
-		left JOIN likes l ON c.content_no = l.content_no
-		left join board b on c.content_no = b.content_no
-		left JOIN content_category on c.content_no = content_category.content_no
-		left join category on content_category.category_no = category.category_no
-		left JOIN menu ON category.menu_no = menu.menu_no
-		WHERE l.user_no =#{id} and b.board_type is null and menu_name is not null
-		GROUP BY c.content_no, c.content_title, c.views, menu.menu_no, menu.menu_name
+		    C.CONTENT_TITLE, C.VIEWS,
+		    C.CONTENT_NO, MENU.MENU_NO, MENU.MENU_NAME,
+		    (SELECT COUNT(*) FROM LIKES L2 WHERE L2.CONTENT_NO = C.CONTENT_NO) AS LIKE_COUNT
+		FROM CONTENT C
+		LEFT JOIN LIKES L ON C.CONTENT_NO = L.CONTENT_NO
+		LEFT JOIN BOARD B ON C.CONTENT_NO = B.CONTENT_NO
+		LEFT JOIN CONTENT_CATEGORY ON C.CONTENT_NO = CONTENT_CATEGORY.CONTENT_NO
+		LEFT JOIN CATEGORY ON CONTENT_CATEGORY.CATEGORY_NO = CATEGORY.CATEGORY_NO
+		LEFT JOIN MENU ON CATEGORY.MENU_NO = MENU.MENU_NO
+		WHERE L.USER_NO = #{ID}
+		  AND B.BOARD_TYPE IS NULL
+		  AND MENU.MENU_NAME IS NOT NULL
+		GROUP BY 
+		    C.CONTENT_NO, 
+		    C.CONTENT_TITLE, 
+		    C.VIEWS, 
+		    MENU.MENU_NO, 
+		    MENU.MENU_NAME
 	</select>
 
 	<select id="selectMyRealProjects">
-		select c.CONTENT_NO,CONTENT_TITLE,c.CREATE_DATE,c.MODIFY_DATE,c.CONTENT_STATUS,c.DELETE_STATUS,c.USER_NO,c.VIEWS,
-		c.MD_RECOMMENDATION,(SELECT COUNT(*) FROM likes WHERE likes.content_no = c.content_no) AS like_count ,
-		b.board_type,m.menu_name, GROUP_CONCAT(ccc.category_name ORDER BY ccc.category_name SEPARATOR ',') AS category_name, m.menu_no
-		from content c
-		left join board b on c.content_no = b.content_no
-		left JOIN content_category cc on c.content_no = cc.content_no
-		left join category ccc on cc.category_no = ccc.category_no
-		left JOIN menu m ON ccc.menu_no = m.menu_no
-		where c.user_no=#{userNo} and b.board_type is null and m.menu_name is not null and c.content_status='Y'
-		group by
-		c.CONTENT_NO,
-		c.CONTENT_TITLE,
-		c.CREATE_DATE,
-		c.MODIFY_DATE,
-		c.CONTENT_STATUS,
-		c.DELETE_STATUS,
-		c.USER_NO,
-		c.VIEWS,
-		c.MD_RECOMMENDATION,
-		b.board_type, m.menu_name, m.menu_no
+		SELECT 
+		    C.CONTENT_NO,
+		    C.CONTENT_TITLE,
+		    C.CREATE_DATE,
+		    C.MODIFY_DATE,
+		    C.CONTENT_STATUS,
+		    C.DELETE_STATUS,
+		    C.USER_NO,
+		    C.VIEWS,
+		    C.MD_RECOMMENDATION,
+		    (SELECT COUNT(*) FROM LIKES WHERE LIKES.CONTENT_NO = C.CONTENT_NO) AS LIKE_COUNT,
+		    B.BOARD_TYPE,
+		    M.MENU_NAME,
+		    GROUP_CONCAT(CCC.CATEGORY_NAME ORDER BY CCC.CATEGORY_NAME SEPARATOR ',') AS CATEGORY_NAME,
+		    M.MENU_NO
+		FROM CONTENT C
+		LEFT JOIN BOARD B ON C.CONTENT_NO = B.CONTENT_NO
+		LEFT JOIN CONTENT_CATEGORY CC ON C.CONTENT_NO = CC.CONTENT_NO
+		LEFT JOIN CATEGORY CCC ON CC.CATEGORY_NO = CCC.CATEGORY_NO
+		LEFT JOIN MENU M ON CCC.MENU_NO = M.MENU_NO
+		WHERE C.USER_NO = #{userNo}
+		  AND B.BOARD_TYPE IS NULL
+		  AND M.MENU_NAME IS NOT NULL
+		  AND C.CONTENT_STATUS = 'Y'
+		GROUP BY
+		    C.CONTENT_NO,
+		    C.CONTENT_TITLE,
+		    C.CREATE_DATE,
+		    C.MODIFY_DATE,
+		    C.CONTENT_STATUS,
+		    C.DELETE_STATUS,
+		    C.USER_NO,
+		    C.VIEWS,
+		    C.MD_RECOMMENDATION,
+		    B.BOARD_TYPE,
+		    M.MENU_NAME,
+		    M.MENU_NO
 	</select>
 
 	<select id="selectuserIdPhone">
@@ -64,51 +88,51 @@
 	</select>
 
 	<select id="findfollow">
-		select count(*)
-		from subscribe
-		where creater_no = #{userNo}
+		SELECT COUNT(*)
+		FROM SUBSCRIBE
+		WHERE CREATER_NO = #{userNo}
 	</select>
 
 	<select id="findId">
 		SELECT USER_ID, USER_NAME
-		FROM users
+		FROM USERS
 		WHERE USER_NAME =#{userName} AND USER_PHONE =#{userPhone} AND USER_EMAIL =#{userEmail}
 	</select>
 
 	<update id="updateInfo">
-		update users
-		set user_name = #{userName},
-		user_nickname = #{userNickname},
-		user_phone = #{userPhone},
-		user_email = #{userEmail},
-		user_birth = #{userBirth},
-		user_gender = #{userGender},
-		user_comment = #{userComment}
-		where user_no = #{userNo}
+		UPDATE USERS
+		SET USER_NAME = #{userName},
+		    USER_NICKNAME = #{userNickname},
+		    USER_PHONE = #{userPhone},
+		    USER_EMAIL = #{userEmail},
+		    USER_BIRTH = #{userBirth},
+		    USER_GENDER = #{userGender},
+		    USER_COMMENT = #{userComment}
+		WHERE USER_NO = #{userNo}
 	</update>
 
 	<update id="changePw">
-		update users
-		set user_pw = #{userPw}
-		where user_no = #{userNo}
+		UPDATE USERS
+		SET USER_PW = #{userPw}
+		WHERE USER_NO = #{userNo}
 	</update>
 
 	<select id="findPw">
-		select count(*)
-		from users
-		where user_id =#{userId} and user_phone = #{userPhone}
+		SELECT COUNT(*)
+		FROM USERS
+		WHERE USER_ID =#{userId} AND USER_PHONE = #{userPhone}
 	</select>
 
 	<update id="tempPwd">
-		update users
-		set USER_PW =#{userPw}
-		where user_id =#{userId}
+		UPDATE USERS
+		SET USER_PW =#{userPw}
+		WHERE USER_ID =#{userId}
 	</update>
 
 	<select id="findName">
-		select USER_NAME
-		from users
-		where user_id =#{userId}
+		SELECT USER_NAME
+		FROM USERS
+		WHERE USER_ID =#{userId}
 	</select>
 
 	<select id="existUsers">
@@ -118,63 +142,68 @@
 	</select>
 
 	<select id="selectTopUser">
-		select U.USER_NO,
-		   U.USER_ID,
-		   U.USER_NICKNAME,
-		   U.USER_NAME,
-		   U.USER_PHONE,
-		   U.USER_EMAIL,
-		   U.USER_COMMENT,
-		   u.user_profile,count(s.subscribe_no) as subscriber
-		from users u
-			 join subscribe s on u.user_no = s.creater_no
-		group by U.USER_NO,
-			 U.USER_ID,
-			 U.USER_NICKNAME,
-			 U.USER_NAME,
-			 U.USER_PHONE,
-			 U.USER_EMAIL,
-			 U.USER_COMMENT,
-			 u.user_profile
-		order by subscriber desc
+		SELECT 
+		    U.USER_NO,
+		    U.USER_ID,
+		    U.USER_NICKNAME,
+		    U.USER_NAME,
+		    U.USER_PHONE,
+		    U.USER_EMAIL,
+		    U.USER_COMMENT,
+		    U.USER_PROFILE,
+		    COUNT(S.SUBSCRIBE_NO) AS SUBSCRIBER
+		FROM USERS U
+		JOIN SUBSCRIBE S ON U.USER_NO = S.CREATER_NO
+		GROUP BY 
+		    U.USER_NO,
+		    U.USER_ID,
+		    U.USER_NICKNAME,
+		    U.USER_NAME,
+		    U.USER_PHONE,
+		    U.USER_EMAIL,
+		    U.USER_COMMENT,
+		    U.USER_PROFILE
+		ORDER BY SUBSCRIBER DESC
 		LIMIT 12
 	</select>
 
 	<update id="updateUserPlan">
-		update users
-		set user_plan = #{userPlan}
-		where user_no = #{userNo}
+		UPDATE USERS
+		SET USER_PLAN = #{userPlan}
+		WHERE USER_NO = #{userNo}
 	</update>
+	
 	<select id="getPaymentDate">
-		select payment_date from users join payment using(user_no)
-		where user_no=#{userNo} order by payment_date desc
+		SELECT PAYMENT_DATE FROM USERS JOIN PAYMENT USING(USER_NO)
+		WHERE USER_NO=#{userNo} ORDER BY PAYMENT_DATE DESC
 		LIMIT 1
 	</select>
+	
 	<update id="deleteUserPlan">
-		update users
-		set user_plan = null where user_no=#{userNo}
+		UPDATE USERS
+		SET USER_PLAN = NULL WHERE USER_NO=#{userNo}
 	</update>
 
 	<update id="updateAlertShown">
-		update users
-		set alert_shown=1 where user_no=#{userNo}
+		UPDATE USERS
+		SET ALERT_SHOWN=1 WHERE USER_NO=#{userNo}
 	</update>
 
 	<update id="resetAlertShown">
-		update users
-		set alert_shown=0 where user_no=#{userNo}
+		UPDATE USERS
+		SET ALERT_SHOWN=0 WHERE USER_NO=#{userNo}
 	</update>
 
 	<update id="updateProfile">
-		update users
-		set user_profile = #{userProfile}
-		where user_id = #{userId}
+		UPDATE USERS
+		SET USER_PROFILE = #{userProfile}
+		WHERE USER_ID = #{userId}
 	</update>
 
 	<select id="selectProfile">
-		select user_profile
-		from users
-		where user_id = #{userId}
+		SELECT USER_PROFILE
+		FROM USERS
+		WHERE USER_ID = #{userId}
 	</select>
 
 	<select id="existGoogleUsers">
@@ -185,118 +214,137 @@
 
 	<select id="selectMyMessage">
 		SELECT
-		m.message_no,
-		m.sender_no,
-		sender_user.user_nickname AS sender_name,
-		m.receiver_no,
-		receiver_user.user_nickname AS receiver_name,
-		m.content,
-		m.sent_time,
-		m.read_status,
-		m.conversation_id
-		FROM message m
-		JOIN users sender_user ON m.sender_no = sender_user.user_no
-		JOIN users receiver_user ON m.receiver_no = receiver_user.user_no
-		WHERE m.receiver_no = #{userNo} OR m.sender_no = #{userNo}
-		ORDER BY m.sent_time DESC
+		    M.MESSAGE_NO,
+		    M.SENDER_NO,
+		    SENDER_USER.USER_NICKNAME AS SENDER_NAME,
+		    M.RECEIVER_NO,
+		    RECEIVER_USER.USER_NICKNAME AS RECEIVER_NAME,
+		    M.CONTENT,
+		    M.SENT_TIME,
+		    M.READ_STATUS,
+		    M.CONVERSATION_ID
+		FROM MESSAGE M
+		JOIN USERS SENDER_USER ON M.SENDER_NO = SENDER_USER.USER_NO
+		JOIN USERS RECEIVER_USER ON M.RECEIVER_NO = RECEIVER_USER.USER_NO
+		WHERE M.RECEIVER_NO = #{userNo}
+		   OR M.SENDER_NO = #{userNo}
+		ORDER BY M.SENT_TIME DESC
 	</select>
 	<update id="updateMessageStatus">
-		update message
-		set read_status='Y' where message_no=#{messageNo}
+	    UPDATE MESSAGE
+	    SET READ_STATUS = 'Y'
+	    WHERE MESSAGE_NO = #{messageNo}
 	</update>
+	
 	<select id="existReceiver">
-		select count(*) from users where user_nickname=#{receiverName}
+	    SELECT COUNT(*) 
+	    FROM USERS 
+	    WHERE USER_NICKNAME = #{receiverName}
 	</select>
+	
 	<insert id="insertMessage">
-		INSERT INTO MESSAGE (SENDER_NO, RECEIVER_NO, CONTENT, SENT_TIME, READ_STATUS, CONVERSATION_ID)
-		VALUES (
-		#{senderNo},
-		#{receiverNo},
-		#{content},
-		CURRENT_TIMESTAMP,
-		default,
-		CONCAT(LEAST(#{senderNo}, #{receiverNo}), '_', GREATEST(#{senderNo}, #{receiverNo}))
+	    INSERT INTO MESSAGE (SENDER_NO, RECEIVER_NO, CONTENT, SENT_TIME, READ_STATUS, CONVERSATION_ID)
+	    VALUES (
+	        #{senderNo},
+	        #{receiverNo},
+	        #{content},
+	        CURRENT_TIMESTAMP,
+	        DEFAULT,
+	        CONCAT(LEAST(#{senderNo}, #{receiverNo}), '_', GREATEST(#{senderNo}, #{receiverNo}))
 		)
 	</insert>
+	
 	<select id="getReceiverNo">
-		select user_no from users where user_nickname =#{receiverName}
+	    SELECT USER_NO 
+	    FROM USERS 
+	    WHERE USER_NICKNAME = #{receiverName}
 	</select>
+	
 	<select id="getUnreadMessageCount">
-		select count(*) from message where receiver_no =#{userNo} and read_status='N'
+		SELECT COUNT(*) 
+		FROM MESSAGE 
+		WHERE RECEIVER_NO = #{userNo} AND READ_STATUS = 'N'
 	</select>
 
 	<select id="selectMyDownloads">
-		SELECT
-		c.CONTENT_NO,
-		c.CONTENT_TITLE,
-		c.CREATE_DATE,
-		c.MODIFY_DATE,
-		c.CONTENT_STATUS,
-		c.DELETE_STATUS,
-		c.USER_NO,
-		c.VIEWS,
-		c.MD_RECOMMENDATION,
-		(SELECT COUNT(*) FROM likes l WHERE l.content_no = c.content_no) AS like_count,
-		b.board_type,
-		m.menu_name, m.menu_no,
-		(
-		SELECT GROUP_CONCAT(cg.category_name ORDER BY cg.category_name SEPARATOR ',')
-		FROM content_category cc
-		JOIN category cg ON cc.category_no = cg.category_no
-		WHERE cc.content_no = c.content_no
-		) AS category_name
-		FROM content c
-		LEFT JOIN board b ON c.content_no = b.content_no
-		LEFT JOIN users u ON c.user_no = u.user_no
-		LEFT JOIN downloads d ON c.content_no = d.content_no
-		LEFT JOIN menu m ON (
-		SELECT cg.menu_no
-		FROM content_category cc
-		JOIN category cg ON cc.category_no = cg.category_no
-		WHERE cc.content_no = c.content_no
-		LIMIT 1
-		) = m.menu_no
-		WHERE d.user_no = #{userNo}
-		AND b.board_type IS NULL
-		AND m.menu_name IS NOT NULL
-		AND c.content_status = 'Y'
+	    SELECT
+	        C.CONTENT_NO,
+	        C.CONTENT_TITLE,
+	        C.CREATE_DATE,
+	        C.MODIFY_DATE,
+	        C.CONTENT_STATUS,
+	        C.DELETE_STATUS,
+	        C.USER_NO,
+	        C.VIEWS,
+	        C.MD_RECOMMENDATION,
+	        (SELECT COUNT(*) FROM LIKES L WHERE L.CONTENT_NO = C.CONTENT_NO) AS LIKE_COUNT,
+	        B.BOARD_TYPE,
+	        M.MENU_NAME, 
+	        M.MENU_NO,
+	        (
+	            SELECT GROUP_CONCAT(CG.CATEGORY_NAME ORDER BY CG.CATEGORY_NAME SEPARATOR ',')
+	            FROM CONTENT_CATEGORY CC
+	            JOIN CATEGORY CG ON CC.CATEGORY_NO = CG.CATEGORY_NO
+	            WHERE CC.CONTENT_NO = C.CONTENT_NO
+	        ) AS CATEGORY_NAME
+	    FROM CONTENT C
+	    LEFT JOIN BOARD B ON C.CONTENT_NO = B.CONTENT_NO
+	    LEFT JOIN USERS U ON C.USER_NO = U.USER_NO
+	    LEFT JOIN DOWNLOADS D ON C.CONTENT_NO = D.CONTENT_NO
+	    LEFT JOIN MENU M ON (
+	        SELECT CG.MENU_NO
+	        FROM CONTENT_CATEGORY CC
+	        JOIN CATEGORY CG ON CC.CATEGORY_NO = CG.CATEGORY_NO
+	        WHERE CC.CONTENT_NO = C.CONTENT_NO
+	        LIMIT 1
+	    ) = M.MENU_NO
+	    WHERE D.USER_NO = #{userNo}
+	      AND B.BOARD_TYPE IS NULL
+	      AND M.MENU_NAME IS NOT NULL
+	      AND C.CONTENT_STATUS = 'Y'
 	</select>
+	
 	<select id="selectSubscribeList">
-		SELECT s.creater_no,
-		c.*,
-		sc.subscriberCount,
-		u2.*
-			FROM users u
-			JOIN
-			subscribe s ON u.user_no = s.user_no
-			JOIN
-			content c ON c.user_no = s.creater_no
-			JOIN (SELECT creater_no,
-			COUNT(user_no) AS subscriberCount
-			FROM subscribe
-			GROUP BY creater_no) sc ON sc.creater_no = s.creater_no
-			JOIN
-			users u2 ON u2.user_no = s.creater_no
-		WHERE s.user_no = #{userNo}
+	    SELECT 
+	        S.CREATER_NO,
+	        C.*,
+	        SC.SUBSCRIBERCOUNT,
+	        U2.*
+	    FROM USERS U
+	    JOIN SUBSCRIBE S ON U.USER_NO = S.USER_NO
+	    JOIN CONTENT C ON C.USER_NO = S.CREATER_NO
+	    JOIN (
+	        SELECT CREATER_NO, COUNT(USER_NO) AS SUBSCRIBERCOUNT
+	        FROM SUBSCRIBE
+	        GROUP BY CREATER_NO
+	    ) SC ON SC.CREATER_NO = S.CREATER_NO
+	    JOIN USERS U2 ON U2.USER_NO = S.CREATER_NO
+	    WHERE S.USER_NO = #{userNo}
 	</select>
+	
 	<select id="getInfoUser">
-		select * from users where user_no=#{createrNo}
+		SELECT * 
+		FROM USERS 
+		WHERE USER_NO = #{createrNo}
 	</select>
+	
 	<select id="isSubscribed">
-		select count(*) from subscribe where creater_no =#{createrNo} and user_no =#{userNo} 
+		SELECT COUNT(*) 
+    	FROM SUBSCRIBE 
+    	WHERE CREATER_NO = #{createrNo} AND USER_NO = #{userNo} 
 	</select>
+	
 	<insert id="updateSubscribe" parameterType="map">
 	    <choose>
 	        <when test="isCancel == true">
-	            DELETE FROM subscribe
-	            WHERE creater_no = #{createrNo}
-	              AND user_no = #{userNo}
+	            DELETE FROM SUBSCRIBE
+	            WHERE CREATER_NO = #{createrNo} AND USER_NO = #{userNo}
 	        </when>
 	        <otherwise>
-	            INSERT INTO subscribe(CREATER_NO, USER_NO)
+	            INSERT INTO SUBSCRIBE (CREATER_NO, USER_NO)
 	            VALUES (#{createrNo}, #{userNo})
 	        </otherwise>
 	    </choose>
-</insert>
+	</insert>
 
 </mapper>
