@@ -1,5 +1,6 @@
 package pocopoco_vplay.users.model.mapper;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -45,7 +46,7 @@ public interface UsersMapper {
 
 	int updateUserPlan(HashMap<String, Object> map);
 
-	Object getPaymentDate(Users loginUser);
+	LocalDateTime getPaymentDate(Users loginUser);
 
 	int deleteUserPlan(Users loginUser);
 

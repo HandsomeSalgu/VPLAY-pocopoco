@@ -140,18 +140,17 @@ public class UsersController {
 			// 현재 시스템의 기본날짜로 세팅해준 후 , toLocalDateTime()을 이용해서 최종적으로 LocalDateTime 객체로 변환해주는
 			// 삼단계가 필요함
 			// 생각보다 30일날짜만 더하는건데 녹록치않음 ㅅㅂ;
-			Timestamp loginUserPaymentDate = (Timestamp) uService.getPaymentDate(loginUser);
+			LocalDateTime loginUserPaymentDate = uService.getPaymentDate(loginUser);
+			
 			if (loginUserPaymentDate == null) {
 
 			} else {
 
-				LocalDateTime localDateTime = loginUserPaymentDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-
-				Timestamp loginUserPaymentEndDate = Timestamp.valueOf(localDateTime.plusDays(30));
+				LocalDateTime loginUserPaymentEndDate = loginUserPaymentDate.plusDays(30);
 				// 오늘 날짜 가져오기
-				Timestamp today = Timestamp.valueOf(LocalDateTime.now());
+				LocalDateTime today = LocalDateTime.now();
 
-				boolean isPAymentExpired = today.after(loginUserPaymentEndDate);
+				boolean isPAymentExpired = today.isAfter(loginUserPaymentEndDate);
 				boolean hasSeenAlert = loginUser.isAlertShown();
 				System.out.println(loginUser.isAlertShown());
 

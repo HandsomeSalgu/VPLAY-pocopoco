@@ -16,7 +16,7 @@ public class Mailconfig {
         mailSender.setHost("smtp.gmail.com"); // 메일 호스트
         mailSender.setPort(587); // 메일 포트번호
         mailSender.setUsername("poco.vplay@gmail.com"); // 웹사이트 메일
-        mailSender.setPassword("nhcp lskv drhd jhtz"); // 앱 비밀번호
+        mailSender.setPassword("gohn zctk aznj exia"); // 앱 비밀번호
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
