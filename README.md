@@ -3,8 +3,8 @@
 
 ## 배포 :earth_asia:
 - 배포 링크 : <link>http://vplay.cloud</link>
-- TEST ID : (추후 추가 예정)
-- TEST PWD : (추후 추가 예정)
+- TEST ID : HandsomeGwon
+- TEST PWD : HandsomeGwon
 <br>
 
 ## 수행 기간 :calendar:
