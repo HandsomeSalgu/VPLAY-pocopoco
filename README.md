@@ -1,5 +1,5 @@
 # 영상 템플릿 판매 및 수주 VPLAY - 권태혁
-<img width="500" alt="image" src="https://github.com/user-attachments/assets/622d362f-494e-4aa5-8311-b5fa9558d50c" />
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/17e31643-47b3-4c55-a0a6-de77b84a1ab8" />
 
 ## 배포 :earth_asia:
 - 배포 링크 : <link>http://vplay.cloud</link>
