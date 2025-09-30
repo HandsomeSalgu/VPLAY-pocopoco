@@ -1,5 +1,6 @@
 package pocopoco_vplay.users.model.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -82,7 +83,7 @@ public class UsersService {
 		return mapper.updateUserPlan(map);
 	}
 
-	public Object getPaymentDate(Users loginUser) {
+	public LocalDateTime getPaymentDate(Users loginUser) {
 		return mapper.getPaymentDate(loginUser);
 
 	}

@@ -43,4 +43,6 @@ public interface AdminMapper {
 
 	int insertReply(Reply reply);
 
+	int getTotalPaymentAmount(Object object);
+
 }

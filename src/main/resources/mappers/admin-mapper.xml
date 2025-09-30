@@ -3,56 +3,59 @@
 <mapper namespace="pocopoco_vplay.admin.model.mapper.AdminMapper">
 
 	<select id="selectUser">
-		select user_id
-		from users
-		where user_no = #{userNo}
+	    SELECT USER_ID
+	    FROM USERS
+	    WHERE USER_NO = #{userNo}
 	</select>
 
 	<select id="getUsersCount">
-		select count(*)
-		from users
-
-		<if test="search != null and search != ''">
-			where user_name like '%${search}%'
-		</if>
+	    SELECT COUNT(*)
+	    FROM USERS
+	    <if test="search != null and search != ''">
+	        WHERE USER_NAME LIKE CONCAT('%', #{search}, '%')
+	    </if>
+	</select>
+	
+	<select id="getTotalPaymentAmount">
+		SELECT SUM(PAYMENT_AMOUNT) FROM PAYMENT;
 	</select>
 
 	<select id="selectAllUser">
-		select *
-		from users
-		<if test="search != null and search != ''">
-			where user_name like '%${search}%'
-		</if>
-		order by user_no desc
+	    SELECT *
+	    FROM USERS
+	    <if test="search != null and search != ''">
+	        WHERE USER_NAME LIKE CONCAT('%', #{search}, '%')
+	    </if>
+	    ORDER BY USER_NO DESC
 	</select>
 
 	<select id="getInquiryCount">
-		select count(*)
-		from content
-		join board using(content_no)
-		where board_type = 1
-		<if test="menuNo != null">
-			and menu_no = #{menuNo}
-		</if>
-		<if test="search != null and search != ''">
-			and content_title like '%${search}%'
-		</if>
+	    SELECT COUNT(*)
+	    FROM CONTENT
+	    JOIN BOARD USING(CONTENT_NO)
+	    WHERE BOARD_TYPE = 1
+	    <if test="menuNo != null">
+	        AND MENU_NO = #{menuNo}
+	    </if>
+	    <if test="search != null and search != ''">
+	        AND CONTENT_TITLE LIKE CONCAT('%', #{search}, '%')
+	    </if>
 	</select>
 
 	<select id="selectAllInquiry">
-		select *
-		from content
-		join board using(content_no)
-		join menu using(menu_no)
-		join users using(user_no)
-		where board_type = 1
-		<if test="menuNo != null">
-			and menu_no = #{menuNo}
-		</if>
-		<if test="search != null and search != ''">
-			and (content_title like '%${search}%' or content_detail like '%${search}%')
-		</if>
-		order by content_no desc
+	    SELECT *
+	    FROM CONTENT
+	    JOIN BOARD USING(CONTENT_NO)
+	    JOIN MENU USING(MENU_NO)
+	    JOIN USERS USING(USER_NO)
+	    WHERE BOARD_TYPE = 1
+	    <if test="menuNo != null">
+	        AND MENU_NO = #{menuNo}
+	    </if>
+	    <if test="search != null and search != ''">
+	        AND (CONTENT_TITLE LIKE CONCAT('%', #{search}, '%') OR CONTENT_DETAIL LIKE CONCAT('%', #{search}, '%'))
+	    </if>
+	    ORDER BY CONTENT_NO DESC
 	</select>
 
 
@@ -73,133 +76,157 @@
 	<!-- </select> -->
 
 	<select id="getTemplatesCount">
-		select count(*)
-		from (select c.content_no, c.content_title, c.create_date, c.modify_date, c.content_status, c.delete_status, c.user_no, c.md_recommendation, m.menu_name,
-		LISTAGG(cat.category_name, ',') WITHIN GROUP (ORDER BY cat.category_name) AS category_name
-		from content c
-		left join content_category cc on c.content_no = cc.content_no
-		left join category cat on cc.category_no = cat.category_no
-		left join menu m on cat.menu_no = m.menu_no
-		where not exists (
-		select 1
-		FROM board b
-		where c.content_no = b.content_no
-		)
-		<if test="menuNo != null">
-			and cat.menu_no = #{menuNo}
-		</if>
-		group by c.content_no, c.content_title, c.create_date, c.modify_date, c.content_status, c.delete_status, c.user_no, c.md_recommendation, m.menu_name)
+	    SELECT COUNT(*)
+	    FROM (
+	        SELECT 
+	            C.CONTENT_NO, 
+	            C.CONTENT_TITLE, 
+	            C.CREATE_DATE, 
+	            C.MODIFY_DATE, 
+	            C.CONTENT_STATUS, 
+	            C.DELETE_STATUS, 
+	            C.USER_NO, 
+	            C.MD_RECOMMENDATION, 
+	            M.MENU_NAME,
+	            GROUP_CONCAT(CAT.CATEGORY_NAME ORDER BY CAT.CATEGORY_NAME SEPARATOR ',') AS CATEGORY_NAME
+	        FROM CONTENT C
+	        LEFT JOIN CONTENT_CATEGORY CC ON C.CONTENT_NO = CC.CONTENT_NO
+	        LEFT JOIN CATEGORY CAT ON CC.CATEGORY_NO = CAT.CATEGORY_NO
+	        LEFT JOIN MENU M ON CAT.MENU_NO = M.MENU_NO
+	        WHERE NOT EXISTS (
+	            SELECT 1
+	            FROM BOARD B
+	            WHERE C.CONTENT_NO = B.CONTENT_NO
+	        )
+	        <if test="menuNo != null">
+	            AND CAT.MENU_NO = #{menuNo}
+	        </if>
+	        GROUP BY C.CONTENT_NO, C.CONTENT_TITLE, C.CREATE_DATE, C.MODIFY_DATE, C.CONTENT_STATUS, C.DELETE_STATUS, C.USER_NO, C.MD_RECOMMENDATION, M.MENU_NAME
+	    ) AS T
 	</select>
 
 	<select id="selectAllTemplates">
-		select c.content_no, c.content_title, c.create_date, c.modify_date, c.content_status, c.delete_status, c.user_no, c.md_recommendation, m.menu_name,
-		LISTAGG(cat.category_name, ',') WITHIN GROUP (ORDER BY cat.category_name) AS category_name
-		from content c
-		left join content_category cc on c.content_no = cc.content_no
-		left join category cat on cc.category_no = cat.category_no
-		left join menu m on cat.menu_no = m.menu_no
-		where not exists (
-		select 1
-		FROM board b
-		where c.content_no = b.content_no
-		)
-		<if test="menuNo != null">
-			and cat.menu_no = #{menuNo}
-		</if>
-		<if test="search != null and search != ''">
-			and (c.content_title like '%${search}%' or c.content_detail like '%${search}%')
-		</if>
-		group by c.content_no, c.content_title, c.create_date, c.modify_date, c.content_status, c.delete_status, c.user_no, c.md_recommendation, m.menu_name
-		order by
-		CASE WHEN c.md_recommendation = 'Y' THEN 0 ELSE 1 END,
-		c.content_no desc
+	    SELECT 
+	        C.CONTENT_NO, 
+	        C.CONTENT_TITLE, 
+	        C.CREATE_DATE, 
+	        C.MODIFY_DATE, 
+	        C.CONTENT_STATUS, 
+	        C.DELETE_STATUS, 
+	        C.USER_NO, 
+	        C.MD_RECOMMENDATION, 
+	        M.MENU_NAME,
+	        GROUP_CONCAT(CAT.CATEGORY_NAME ORDER BY CAT.CATEGORY_NAME SEPARATOR ',') AS CATEGORY_NAME
+	    FROM CONTENT C
+	    LEFT JOIN CONTENT_CATEGORY CC ON C.CONTENT_NO = CC.CONTENT_NO
+	    LEFT JOIN CATEGORY CAT ON CC.CATEGORY_NO = CAT.CATEGORY_NO
+	    LEFT JOIN MENU M ON CAT.MENU_NO = M.MENU_NO
+	    WHERE NOT EXISTS (
+	        SELECT 1
+	        FROM BOARD B
+	        WHERE C.CONTENT_NO = B.CONTENT_NO
+	    )
+	    <if test="menuNo != null">
+	        AND CAT.MENU_NO = #{menuNo}
+	    </if>
+	    <if test="search != null and search != ''">
+	        AND (C.CONTENT_TITLE LIKE CONCAT('%', #{search}, '%') OR C.CONTENT_DETAIL LIKE CONCAT('%', #{search}, '%'))
+	    </if>
+	    GROUP BY C.CONTENT_NO, C.CONTENT_TITLE, C.CREATE_DATE, C.MODIFY_DATE, C.CONTENT_STATUS, C.DELETE_STATUS, C.USER_NO, C.MD_RECOMMENDATION, M.MENU_NAME
+	    ORDER BY 
+	        CASE WHEN C.MD_RECOMMENDATION = 'Y' THEN 0 ELSE 1 END,
+	        C.CONTENT_NO DESC
 	</select>
 
 	<select id="getrequestPostCount">
-		select count(*)
-		from content
-		join board using(content_no)
-		where board_type = 2
-		<if test="menuNo != null">
-			and menu_no = #{menuNo}
-		</if>
-		<if test="search != null and search != ''">
-			and (content_title like '%${search}%' or content_detail like '%${search}%')
-		</if>
+	    SELECT COUNT(*)
+	    FROM CONTENT
+	    JOIN BOARD USING(CONTENT_NO)
+	    WHERE BOARD_TYPE = 2
+	    <if test="menuNo != null">
+	        AND MENU_NO = #{menuNo}
+	    </if>
+	    <if test="search != null and search != ''">
+	        AND (CONTENT_TITLE LIKE CONCAT('%', #{search}, '%') OR CONTENT_DETAIL LIKE CONCAT('%', #{search}, '%'))
+	    </if>
 	</select>
 
 	<select id="selectAllRequestPost">
-		select *
-		from content
-		join board using(content_no)
-		join menu using(menu_no)
-		where board_type = 2
-		<if test="menuNo != null">
-			and menu_no = #{menuNo}
-		</if>
-		<if test="search != null and search != ''">
-			and (content_title like '%${search}%' or content_detail like '%${search}%')
-		</if>
-		order by content_no desc
+	    SELECT *
+	    FROM CONTENT
+	    JOIN BOARD USING(CONTENT_NO)
+	    JOIN MENU USING(MENU_NO)
+	    WHERE BOARD_TYPE = 2
+	    <if test="menuNo != null">
+	        AND MENU_NO = #{menuNo}
+	    </if>
+	    <if test="search != null and search != ''">
+	        AND (CONTENT_TITLE LIKE CONCAT('%', #{search}, '%') OR CONTENT_DETAIL LIKE CONCAT('%', #{search}, '%'))
+	    </if>
+	    ORDER BY CONTENT_NO DESC
 	</select>
 
 	<update id="userUpdate">
-		update users
-		set status = #{status}
-		where user_no = #{userNo}
+	    UPDATE USERS
+	    SET STATUS = #{status}
+	    WHERE USER_NO = #{userNo}
 	</update>
 
 	<update id="inquiryUpdate">
-		update content
-		set content_status = #{contentStatus}, delete_status = #{deleteStatus}
-		where content_no = #{contentNo}
+	    UPDATE CONTENT
+	    SET CONTENT_STATUS = #{contentStatus}, 
+	        DELETE_STATUS = #{deleteStatus}
+	    WHERE CONTENT_NO = #{contentNo}
 	</update>
 
 	<update id="templatesUpdate">
-		update content
-		set content_status = #{contentStatus}, delete_status = #{deleteStatus}
-		where content_no = #{contentNo}
+	    UPDATE CONTENT
+	    SET CONTENT_STATUS = #{contentStatus}, 
+	        DELETE_STATUS = #{deleteStatus}
+	    WHERE CONTENT_NO = #{contentNo}
 	</update>
 
 	<update id="requestUpdate">
-		update content
-		set content_status = #{contentStatus}, delete_status = #{deleteStatus}
-		where content_no = #{contentNo}
+	    UPDATE CONTENT
+	    SET CONTENT_STATUS = #{contentStatus}, 
+	        DELETE_STATUS = #{deleteStatus}
+	    WHERE CONTENT_NO = #{contentNo}
 	</update>
 
 	<select id="countMenuTemp">
-		select count(*)
-		from content co
-		left join board b on(co.content_no = b.content_no)
-		left join content_category coa on(co.content_no = coa.content_no)
-		left join category ca on(ca.category_no = coa.category_no)
-		left outer join menu me on(ca.menu_no = me.menu_no)
-		where board_type is null and
-		<if test="i == 1">
-			me.menu_no = 1
-		</if>
-		<if test="i == 2">
-			me.menu_no = 2
-		</if>
-		<if test="i == 3">
-			me.menu_no = 3
-		</if>
-		<if test="i == 4">
-			me.menu_no = 4
-		</if>
-		<if test="i == 5">
-			me.menu_no = 5
-		</if>
-		<if test="i == 6">
-			me.menu_no = 6
-		</if>
-		<if test="i == 7">
-			me.menu_no = 7
-		</if>
+	    SELECT COUNT(*)
+	    FROM CONTENT CO
+	    LEFT JOIN BOARD B ON CO.CONTENT_NO = B.CONTENT_NO
+	    LEFT JOIN CONTENT_CATEGORY COA ON CO.CONTENT_NO = COA.CONTENT_NO
+	    LEFT JOIN CATEGORY CA ON CA.CATEGORY_NO = COA.CATEGORY_NO
+	    LEFT OUTER JOIN MENU ME ON CA.MENU_NO = ME.MENU_NO
+	    WHERE BOARD_TYPE IS NULL
+	    <if test="i == 1">
+	        AND ME.MENU_NO = 1
+	    </if>
+	    <if test="i == 2">
+	        AND ME.MENU_NO = 2
+	    </if>
+	    <if test="i == 3">
+	        AND ME.MENU_NO = 3
+	    </if>
+	    <if test="i == 4">
+	        AND ME.MENU_NO = 4
+	    </if>
+	    <if test="i == 5">
+	        AND ME.MENU_NO = 5
+	    </if>
+	    <if test="i == 6">
+	        AND ME.MENU_NO = 6
+	    </if>
+	    <if test="i == 7">
+	        AND ME.MENU_NO = 7
+	    </if>
 	</select>
 
 	<insert id="insertReply">
-		insert into reply
-		values(REPLY_SEQ.nextval, #{replyDetail}, sysdate, sysdate, 'Y', #{contentNo}, #{userNo})
+	    INSERT INTO REPLY(REPLY_DETAIL, CREATE_DATE, MODIFY_DATE, REPLY_STATUS, CONTENT_NO, USER_NO)
+	    VALUES (#{replyDetail}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Y', #{contentNo}, #{userNo})
 	</insert>
+
 </mapper>

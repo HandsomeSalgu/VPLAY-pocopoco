@@ -1,8 +1,10 @@
 package pocopoco_vplay.admin.controller;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -41,7 +43,10 @@ public class AdminController {
 		HashMap<String, String> map = new HashMap<>();
 		int userCount = aService.getUsersCount(map);
 		int templatesCount = aService.getTemplatesCount(null);
-		mv.addObject("userCount", userCount).addObject("templatesCount", templatesCount);
+		int money = aService.getTotalPaymentAmount(null);
+		
+		String totalPaymentAmount = NumberFormat.getNumberInstance(Locale.KOREA).format(money);
+		mv.addObject("userCount", userCount).addObject("templatesCount", templatesCount).addObject("totalPaymentAmount", totalPaymentAmount);
 		mv.setViewName("dashboard");
 		return mv;
 	}

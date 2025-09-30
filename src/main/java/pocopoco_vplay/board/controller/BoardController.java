@@ -470,11 +470,17 @@ public class BoardController {
 
 	@GetMapping("/{menuName:[a-zA-Z-]+}/{no:\\d+}")
 	public String videoTempDetail(@PathVariable("menuName") String menuName, @PathVariable("no") int contentNo, Model model, HttpSession session) {
-		HashMap<String, Object> map = new HashMap<>();
+		
+		System.out.println(menuName);
+		System.out.println(contentNo);
+		
+		HashMap<String, Object> map = new HashMap<>();	
 		
 		Content content = bService.allMenuDetail(contentNo);
 		ArrayList<Files> fList = bService.contentFile(contentNo);
 		
+		System.out.println(content.toString());
+		System.out.println("menuName : " + content.getMenuName());
 		
 		map.put("menuName", content.getMenuName());
 		map.put("recentList", 6);

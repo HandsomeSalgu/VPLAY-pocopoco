@@ -87,4 +87,8 @@ public class AdminService {
 	public int insertReply(Reply reply) {
 		return mapper.insertReply(reply);
 	}
+
+	public int getTotalPaymentAmount(Object object) {
+		return mapper.getTotalPaymentAmount(null);
+	}
 }
