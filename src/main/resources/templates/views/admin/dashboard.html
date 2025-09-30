@@ -31,7 +31,7 @@
 					</div>
 				</div>
 				<div class="stat-change">
-					<span class="stat-change-up">▲ 23명</span> <span class="stat-change-period">Yester Day</span>
+					<!-- <span class="stat-change-up">▲ 23명</span> <span class="stat-change-period">Yester Day</span> -->
 				</div>
 			</div>
 
@@ -46,11 +46,11 @@
 					</div>
 					<div>
 						<div class="stat-title">총 결제 금액</div>
-						<div class="stat-value">1,213,526원</div>
+						<div class="stat-value">[[${totalPaymentAmount}]]원</div>
 					</div>
 				</div>
 				<div class="stat-change">
-					<span class="stat-change-up">▲ 18.7%</span> <span class="stat-change-period">Last Week</span>
+					<!-- <span class="stat-change-up">▲ 18.7%</span> <span class="stat-change-period">Last Week</span> -->
 				</div>
 			</div>
 
@@ -69,7 +69,7 @@
 					</div>
 				</div>
 				<div class="stat-change">
-					<span class="stat-change-down">▼ 8.1%</span> <span class="stat-change-period">Yester Day</span>
+					<!-- <span class="stat-change-down">▼ 8.1%</span> <span class="stat-change-period">Yester Day</span> -->
 				</div>
 			</div>
 
@@ -94,10 +94,11 @@
 				
 			</div>
 		</div>
-
+		<!--  
 		<div class="chart-container">
 			<canvas id="statsChart"></canvas>
 		</div>
+		-->
 	</div>
 
 	<script>
@@ -202,7 +203,14 @@
           title: '',
           backgroundColor: 'transparent',
           colors: ["#5E37E9", "#8137E9", "#ECDEFF"],
-          lineWidth : 0
+          lineWidth : 1,
+          
+          legend: {
+        	    textStyle: {
+        	      color: '#FFFFFF',
+        	      fontSize: 10
+        	    }
+        	  }
         };
 
         var chart = new google.visualization.PieChart(document.getElementById('piechart'));

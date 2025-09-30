@@ -371,27 +371,37 @@
 				location.href = "/users/createrPage?createrNo=" + createrNo + "&subscriberCount=" + count;
 			})
 			
-			//구독
+			//구독 누르기
 			const subscribe = creator.querySelector('button');
+			const subscribeCount = creator.querySelector('.subscriber_count');
+			const clickUserNo = loginUser.userNo;
+			console.log("subscribeCount : " + subscribeCount);
 			subscribe.addEventListener('click', function(event){
-				const isCancel = subscribe.innerText == "-";
+				
+				// 자신의 페이지에는 구독이 안되게 설정
+				if( clickUserNo ==  createrNo){
+					alert("자신의 계정에는 구독을 할 수 없습니다.")
+				}else{
+					const isCancel = subscribe.innerText == "-";
 
-		        fetch("/users/post/updateSubscribe", {
-		            method: "POST",
-		            headers: { 'content-type': 'application/json; charset=UTF-8' },
-		            body: JSON.stringify({
-		                createrNo: createrNo,
-		                isCancel: isCancel
-		            })
-		        })
-		        .then(response => response.json())
-		        .then(data => {
-		            if (data === 1) {
-		            	subscribe.innerText = isCancel ? "+" : "-";
-		            }
-		        });
-		        
-		        event.stopPropagation();
+			        fetch("/users/post/updateSubscribe", {
+			            method: "POST",
+			            headers: { 'content-type': 'application/json; charset=UTF-8' },
+			            body: JSON.stringify({
+			                createrNo: createrNo,
+			                isCancel: isCancel
+			            })
+			        })
+			        .then(response => response.json())
+			        .then(data => {
+			            if (data === 1) {
+			            	subscribe.innerText = isCancel ? "+" : "-";
+			            	subscribeCount.innerText = isCancel ? Number(subscribeCount.innerText) - 1 : Number(subscribeCount.innerText) + 1;
+			            }
+			        });
+   
+				}
+				event.stopPropagation();
 			})
 		})
 		

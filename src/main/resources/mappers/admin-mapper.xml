@@ -15,6 +15,10 @@
 	        WHERE USER_NAME LIKE CONCAT('%', #{search}, '%')
 	    </if>
 	</select>
+	
+	<select id="getTotalPaymentAmount">
+		SELECT SUM(PAYMENT_AMOUNT) FROM PAYMENT;
+	</select>
 
 	<select id="selectAllUser">
 	    SELECT *
