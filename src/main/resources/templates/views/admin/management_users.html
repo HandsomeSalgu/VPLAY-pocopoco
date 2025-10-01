@@ -40,8 +40,14 @@
 							<td th:text="${u.userEmail}"></td>
 							<td th:text="${u.userPhone}"></td>
 							<td th:text="${u.joinDate}"></td>
-							<td><span class="status" th:data-userno="${u.userNo}" th:onclick="updateStatus(this)" th:classappend="${u.status == 'Y' ? 'active' : 'inactive'}" th:text="${u.status}"></span></td>
-							<td>⋮</td>
+							<td><span class="status" th:data-userno="${u.userNo}" th:onclick="if(confirm('상태를 변경하시겠습니까?')) {updateStatus(this)};" th:classappend="${u.status == 'Y' ? 'active' : 'inactive'}" th:text="${u.status}"></span></td>
+							<td class="AddSettings">
+								<div>⋮</div>
+								<span id="setBtn" class="hover_action">
+									<span th:text="${u.isAdmin == 'Y' ? '관리자 취소' : '관리자 등록'}"></span>
+									<span style = 'display: none;'>[[${u.isAdmin}]]</span>
+								</span>
+							</td>
 						</tr>
 					</tbody>
 				</table>
@@ -86,6 +92,71 @@
                 error: data => console.log(data)
             });
         }
+        
+        document.querySelectorAll(".AddSettings").forEach(td => {
+            let clickFlag = true;
+
+            let hoverAction = td.querySelector(".hover_action");
+
+            td.addEventListener("click", function () {
+                if (clickFlag) {
+                    console.log(clickFlag);
+
+                    let rect = td.getBoundingClientRect(); // 현재 td의 화면 내 위치 가져오기
+
+                    hoverAction.style.position = "fixed"; // 화면 기준으로 위치 설정
+                    hoverAction.style.top = `${rect.top + window.scrollY}px`; // td와 같은 높이에 위치
+                    hoverAction.style.left = `${rect.right - 30}px`; // td 바로 오른쪽에 위치 (+10px 여백)
+                    hoverAction.style.display = "block";
+                    hoverAction.style.zIndex = "99999"; // 최상단으로 설정
+                    clickFlag = false;
+                }else{
+                    clickFlag = true;
+                    hoverAction.style.display = "none";
+
+                }
+
+                document.addEventListener("click", function (event) {
+                    if (!td.contains(event.target)) {
+                        hoverAction.style.display = "none";
+                    }
+                });
+            });
+        });
+        
+        const adminButtons = document.querySelectorAll("#setBtn");
+        [...adminButtons].map((btn, index, array) =>{
+        	btn.addEventListener("click", function(){
+        		let isAdmin = this.children[1].innerText;
+        		const userNo = this.parentElement.parentElement.children[0].innerText;
+        		
+        		if(isAdmin == 'Y'){
+        			isAdmin = 'N';
+        		}else{
+        			isAdmin = 'Y';
+        		}
+        		
+        		fetch('/admin/updateAdmin', {
+     				method : 'put',
+     				headers : {'content-type':'application/json; charset=UTF-8'},
+     				body: JSON.stringify({
+     					isAdmin: isAdmin,
+     					userNo : userNo
+     				})
+     			})
+     			.then(response => response.json())
+     			.then(data =>{
+     				if(isAdmin == 'N'){
+     					this.children[0].innerText = '관리자 등록';
+     					this.children[1].innerText = 'N';
+     				}else{
+     					this.children[0].innerText = '관리자 취소';
+     					this.children[1].innerText = 'Y';
+     				}
+     			})
+        	})
+        })
+
     </script>
 </body>
 </html>

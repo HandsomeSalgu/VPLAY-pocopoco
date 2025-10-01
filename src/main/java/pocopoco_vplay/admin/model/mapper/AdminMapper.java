@@ -45,4 +45,6 @@ public interface AdminMapper {
 
 	int getTotalPaymentAmount(Object object);
 
+	int updateAdmin(HashMap<String, Object> map);
+
 }

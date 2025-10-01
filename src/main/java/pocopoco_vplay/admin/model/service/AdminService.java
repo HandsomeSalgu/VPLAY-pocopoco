@@ -91,4 +91,8 @@ public class AdminService {
 	public int getTotalPaymentAmount(Object object) {
 		return mapper.getTotalPaymentAmount(null);
 	}
+
+	public int updateAdmin(HashMap<String, Object> map) {
+		return mapper.updateAdmin(map);
+	}
 }

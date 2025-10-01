@@ -46,7 +46,7 @@
 							<td>[[${t.userId}]]</td>
 							<td>[[${t.contentTitle}]]</td>
 							<td>[[${t.modifyDate}]]</td>
-							<td><span class="status" th:data-contentno="${t.contentNo}" th:onclick="updateStatus(this)" th:classappend="${t.contentStatus == 'Y' ? 'active' : 'inactive'}">[[${t.contentStatus}]]</span></td>
+							<td><span class="status" th:data-contentno="${t.contentNo}" th:onclick="if(confirm('상태를 변경하시겠습니까?')) { updateStatus(this); } event.stopPropagation(); "th:classappend="${t.contentStatus == 'Y' ? 'active' : 'inactive'}">[[${t.contentStatus}]]</span></td>
 							<td class="AddSettings">
 								<div>⋮</div>
 								<span id="RecommendedBtn" class="hover_action">
@@ -54,6 +54,7 @@
 									<span th:style="${t.mdRecommendation == 'N' ? 'display: none;' : ''}" class="mdCancel">MD추천 취소</span>
 								</span>
 							</td>
+							<td style="display: none;">[[${t.menuNo}]]</td>
 						</tr>
 					</tbody>
 				</table>
@@ -79,11 +80,14 @@
 	</main>
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
+		
+	
         function updateStatus(element) {
+        	event.stopPropagation();
             const currentStatus = element.innerText;
             const newStatus = currentStatus === "Y" ? "N" : "Y";
             const contentNo = element.getAttribute("data-contentno");
-
+			
             $.ajax({
                 url: "/admin/rupdate",
                 data: { contentNo: contentNo, contentStatus: newStatus },
@@ -110,6 +114,38 @@
 		});
 
 		document.addEventListener("DOMContentLoaded", function () {
+			
+			//글 클릭시 해당 글 페이지로 이동
+			const requestList = document.querySelectorAll(".request-list");
+			[...requestList].map((request, index, array) =>{
+				request.addEventListener('click', function(event){
+					
+					//md 버튼 강제이동 막기
+					if (event.target.closest(".mdRec") || 
+				      	event.target.closest(".mdCancel") || 
+				      	event.target.closest(".AddSettings")) {
+				    	return;
+				  	}
+					
+					const contentNo = this.children[0].innerText;
+					const menuNo = this.children[7].innerText;
+					console.log(menuNo);
+					let menuName = "ㅎㅇ";
+					
+					switch(menuNo){
+					case "1": menuName = "video-templates"; break;
+					case "2": menuName = "music"; break;
+					case "3": menuName = "sound-effect"; break;
+					case "4": menuName = "graphic-templates"; break;
+					case "5": menuName = "stock-video"; break;
+					case "6": menuName = "photo"; break;
+					case "7": menuName = "font";
+					}
+					console.log(menuName);
+					window.location.href = '/board/' + menuName + "/" + contentNo;
+				})
+			})
+			
 	        document.querySelectorAll(".AddSettings").forEach(td => {
 	            let clickFlag = true;
 
@@ -146,7 +182,6 @@
 
 
 	const mdButtons = document.querySelectorAll("#RecommendedBtn .mdRec, #RecommendedBtn .mdCancel");
-
 	for (const button of mdButtons) {
 		button.addEventListener('click', function () {
 			let tr = this.closest("tr");
@@ -179,7 +214,7 @@
 					}
 				}else if(data === -1){
 					console.log(data);
-					alert("MD추천 최대 갯수는 8개까지 입니다.");
+					alert("MD추천 최대 갯수는 6개까지 입니다.");
 				}
 				else {
 					alert('상태변경에 실패하여 페이지가 새로고침 됩니다.');

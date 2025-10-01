@@ -25,6 +25,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import pocopoco_vplay.admin.model.service.AdminService;
 import pocopoco_vplay.board.exception.BoardException;
 import pocopoco_vplay.board.model.service.BoardService;
 import pocopoco_vplay.board.model.vo.Content;
@@ -43,6 +44,7 @@ public class AjaxController {
 	private final BoardService bService;
 	private final UsersService uService;
 	private final R2Service r2Service;
+	private final AdminService aService;
 	
 	@PutMapping("like")
 	public int likeAllTemp(@RequestBody HashMap<String, Integer> map, HttpSession session){
@@ -326,7 +328,13 @@ public class AjaxController {
 		
 	}
 	
+	@PutMapping("updateAdmin")
+	public int updateAdmin(@RequestBody HashMap<String, Object> map) {
 	
+		int result = aService.updateAdmin(map);
+		System.out.println(result);
+		return result;
+	}
 	
 	
 	
