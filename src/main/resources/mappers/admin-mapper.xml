@@ -229,5 +229,11 @@
 	    INSERT INTO REPLY(REPLY_DETAIL, CREATE_DATE, MODIFY_DATE, REPLY_STATUS, CONTENT_NO, USER_NO)
 	    VALUES (#{replyDetail}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Y', #{contentNo}, #{userNo})
 	</insert>
+	
+	<update id="updateAdmin" parameterType="map">
+		UPDATE USERS
+		SET IS_ADMIN = #{isAdmin}
+		WHERE USER_NO = #{userNo}
+	</update>
 
 </mapper>
