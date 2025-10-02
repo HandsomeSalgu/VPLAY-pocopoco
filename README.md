@@ -254,5 +254,13 @@ DB에 저장된 파일 URL을 img 태그나 video 태그의 src 속성에 넣으
 <br>또한 제가 맡은 주요 기능 중 하나는 Cloudflare를 활용한 파일 관리 및 다운로드 기능이었습니다.<br> 이전 프로젝트에서는 파일을 로컬에서 직접 관리했지만,<br> 이번에는 CDN 기반의 Cloudflare를 도입해 첨부파일과 썸네일을 효율적으로 관리할 수 있도록 구현했습니다.<br> 사용자가 글 작성 시 파일을 첨부하면 해당 파일이 Cloudflare에 업로드되고, 그 주소가 DB에 등록되도록 설계했습니다.<br> 이후 다른 사용자가 파일을 다운로드할 때는 DB에 저장된 주소를 기반으로 Cloudflare에 접근해 파일을 받을 수 있도록 처리했습니다.<br> 이 경험을 통해 단순한 기능 구현을 넘어 외부 서비스를 활용한 안정적이고 확장성 있는 구조 설계의 필요성을 배울 수 있었습니다.
 <br>
 
+## ERD
+<img width="2761" height="1102" alt="image" src="https://github.com/user-attachments/assets/1656cfe2-ca5e-4043-be6a-4c1fbd7a8d87" />
+
 ## 요구사항 정의서
-<link>https://docs.google.com/spreadsheets/d/10CiUG18fGrM2qKxKslMeXjslcGnF8abdkhVaAl-C9Gc/edit?gid=0#gid=0</link>
+<img width="1083" height="1056" alt="image" src="https://github.com/user-attachments/assets/534b8f4d-ddd4-4038-8dd2-edd83cf2032e" />
+
+## 유스케이스 다이어그램
+<img width="906" height="500" alt="image" src="https://github.com/user-attachments/assets/3bb4f5de-cfe8-4648-b5df-5f89af8e175e" />
+
+
