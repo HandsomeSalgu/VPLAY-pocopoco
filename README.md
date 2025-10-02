@@ -192,6 +192,8 @@ Mapper에서는 choose-when 구문을 사용해 메뉴 이름에 따라 해당 �
 - URL 직관성을 강화하기 위해 사용자가 카테고리를 클릭했을 때, window.history.pushState를 사용해 새로고침 없이 URL만 변경되도록 구성했습니다.
 - 다만, 뒤로 가기를 눌렀을 때는 동기 방식으로 처리되어 오류가 발생할 수 있기 때문에, 해당 URL로 들어올 경우를 대비한 Controller를 따로 만들어 대응했습니다.
 
+---
+
 ### 3. **콘텐츠 업로드 및 다운로드 기능**
 
 ### 게시물 업로드
@@ -219,6 +221,8 @@ Controller에서는 MultipartFile 클래스로 받아 getOriginalFilename()을 �
 uploadFile 메소드에서는 UUID,randomUUID()와 원본 파일명을 조합하여 고유한 파일명을 생성한 뒤, putObejct 메소드를 사용해 R2에 업로드합니다.
 업로드가 완료되면 Cloudflare R2의 publicUrl, 파일명, 원본 파일명을 DB에 보내 저장됩니다.
 이렇게 보내는 이유는 이후 글을 조회할 때 DB에 저장된 URL과 파일명을 활용하여 클라이언트에서 실제 파일들을 불러옵니다.
+
+---
 
 ### 게시물 상세페이지(다운로드)
 
