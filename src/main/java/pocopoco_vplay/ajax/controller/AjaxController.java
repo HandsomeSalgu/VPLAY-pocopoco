@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -41,6 +42,7 @@ import pocopoco_vplay.users.model.vo.Users;
 @RequiredArgsConstructor
 public class AjaxController {
 	
+	private final BCryptPasswordEncoder bcrypt;
 	private final BoardService bService;
 	private final UsersService uService;
 	private final R2Service r2Service;
@@ -336,7 +338,23 @@ public class AjaxController {
 		return result;
 	}
 	
-	
+	@PostMapping("checkSignIn")
+	public int checkSignIn(@RequestBody HashMap<String, String> map) {
+		
+		Users checkId = new Users();
+		checkId.setUserId(map.get("userId"));
+		
+		Users loginUser = uService.signIn(checkId);
+		
+		int result = 0;
+		
+		if(loginUser != null && bcrypt.matches(map.get("userPw"), loginUser.getUserPw())) {
+			result = 1;
+		}
+		
+		
+		return result;
+	}
 	
 	
 	

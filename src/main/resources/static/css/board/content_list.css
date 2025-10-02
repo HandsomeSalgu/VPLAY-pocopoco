@@ -7,6 +7,10 @@
 	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+.container {
+  max-width: 100% !important;
+}
+
 body {
 	background-color: #191820;
 	color: #ffffff;
@@ -46,20 +50,10 @@ body {
 	text-decoration: none;
 }
 
-.main-content {
-	display: flex;
-	min-height: calc(100vh - 64px);
-}
-
 .sidebar {
 	width: 250px;
 	padding: 1.5rem;
 	background-color: #1f1f2c;
-}
-
-.content {
-	flex: 1;
-	padding: 2rem;
 }
 
 .title {
@@ -241,13 +235,6 @@ body {
 	cursor: pointer;
 }
 
-.template-grid {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 30px;
-	cursor: pointer;
-}
-
 .template-card {
 	border-radius: 12px;
 	display: flex;
@@ -365,3 +352,187 @@ span.icon_wrap {
 	display: flex;
 	gap: 8px;
 }
+
+/*사이드바*/
+/* 향상된 hidden 클래스와 부드러운 트랜지션 */
+.hidden {
+	opacity: 0;
+	max-height: 0;
+	overflow: hidden;
+	transition: opacity 0.3s ease, max-height 0.3s ease;
+}
+
+/* Flexbox를 사용한 메인 콘텐츠 레이아웃 */
+.main-content {
+	display: flex;
+	min-height: calc(100vh - 64px);
+	transition: all 0.3s ease;
+	position: relative;
+}
+
+/* 트랜지션이 적용된 사이드바 컨테이너 */
+.categorywrap {
+	transition: width 0.3s ease;
+	width: 250px;
+	flex-shrink: 0;
+	margin-top: 45px;
+}
+
+/* 사이드바가 숨겨졌을 때 (flexdirection 클래스 적용) */
+.categorywrap.flexdirection {
+	width: 60px;
+}
+
+/* Flex grow를 사용한 콘텐츠 영역 */
+.content {
+	flex: 1;
+	padding: 2rem;
+	transition: all 0.3s ease;
+}
+
+/* 사이드바가 숨겨졌을 때 콘텐츠 영역 확장 */
+.categorywrap.flexdirection+.content {
+	margin-left: 60px;
+}
+
+/* 숨길 수 있는 요소들의 기본 스타일 */
+.category-list, .category-title, .sidebar {
+	opacity: 1;
+	max-height: 1000px; /* 충분히 큰 값으로 설정 */
+	overflow: hidden;
+	transition: opacity 0.3s ease, max-height 0.3s ease;
+}
+
+/* 개선된 flexdirection 클래스 */
+.flexdirection {
+	position: absolute;
+	left: 0;
+	transition: left 0.3s ease;
+	z-index: 10;
+}
+
+/* 향상된 사이드바 스타일링 */
+.sidebar {
+	position: fixed;
+	top: 20;
+	left: 20;
+	width: 250px;
+	padding: 1.5rem;
+	background-color: #1f1f2c;
+	border-radius: 0 10px 10px 0;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	transition: width 0.3s ease, padding 0.3s ease;
+	z-index: 0;
+}
+
+/* 사이드바가 숨겨졌을 때 */
+.categorywrap.flexdirection .sidebar {
+	width: 60px;
+	padding: 1.5rem 0;
+}
+
+/* 개선된 카테고리 리스트 스타일링 */
+.category-list {
+	list-style: none;
+	overflow-y: auto;
+	max-height: calc(100vh - 200px);
+}
+
+.category-list::-webkit-scrollbar {
+	width: 5px;
+}
+
+.category-list::-webkit-scrollbar-thumb {
+	background-color: #6137e9;
+	border-radius: 5px;
+}
+
+.category-list li {
+	padding: 0.5rem 0;
+	color: #6f757d;
+	cursor: pointer;
+	transition: color 0.2s ease;
+}
+
+.category-list li:hover {
+	color: #ffffff;
+}
+
+/* 개선된 카테고리 제목 */
+.category-title {
+	color: #ffffff;
+	font-weight: 500;
+	margin: 1rem 0;
+	padding-bottom: 0.5rem;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 토글 버튼의 고정 위치 */
+#CategoriesViewButton {
+	position: fixed;
+	top: 80px;
+	left: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	cursor: pointer;
+	padding: 10px;
+	transition: transform 0.2s ease, background-color 0.2s ease;
+	border-radius: 8px;
+	background-color: #1f1f2c;
+	z-index: 1000;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+	width: 45px;
+	height: 45px;
+}
+
+#CategoriesViewButton:hover {
+	background-color: rgba(255, 255, 255, 0.1);
+	transform: scale(1.05);
+}
+
+/* 반응형 템플릿 그리드 - 사이드바 상태와 관계없이 3개 항목 유지 */
+.template-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 30px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+/* 템플릿 카드의 종횡비 유지 */
+.template-card {
+	border-radius: 12px;
+	display: flex;
+	position: relative;
+	overflow: hidden;
+	flex-direction: column;
+	height: 18rem;
+	transition: all 0.3s ease;
+}
+
+/* 작은 화면에 대한 반응형 조정 */
+@media ( max-width : 1920px) {
+	.template-grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+@media ( max-width : 1400px) {
+	.template-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media ( max-width : 768px) {
+	.template-grid {
+		grid-template-columns: repeat(1, 1fr);
+	}
+	#CategoriesViewButton {
+		top: 70px;
+		left: 10px;
+	}
+}
+
+

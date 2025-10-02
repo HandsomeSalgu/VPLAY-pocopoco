@@ -95,4 +95,5 @@ public class AdminService {
 	public int updateAdmin(HashMap<String, Object> map) {
 		return mapper.updateAdmin(map);
 	}
+
 }
