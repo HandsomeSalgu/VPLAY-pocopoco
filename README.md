@@ -173,7 +173,8 @@ Mapper에서는 choose-when 구문을 사용해 메뉴 이름에 따라 해당 �
 
 **주소 : http://vplay.cloud/board/video-template-list**
 
-<img width="1887" height="981" alt="image" src="https://github.com/user-attachments/assets/8fc617ec-4201-403e-9a26-15ae886149cc" />
+<img width="1884" height="986" alt="image" src="https://github.com/user-attachments/assets/211420fb-98e3-48e7-a7a9-b1faf0b13524" />
+
 
 **주요 구현 화면**
 
