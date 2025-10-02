@@ -96,4 +96,9 @@ public class AdminService {
 		return mapper.updateAdmin(map);
 	}
 
+	public int getTotalDownloads(Object object) {
+		// TODO Auto-generated method stub
+		return mapper.getTotalDownloads(null);
+	}
+
 }

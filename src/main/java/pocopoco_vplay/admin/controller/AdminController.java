@@ -44,9 +44,10 @@ public class AdminController {
 		int userCount = aService.getUsersCount(map);
 		int templatesCount = aService.getTemplatesCount(null);
 		int money = aService.getTotalPaymentAmount(null);
+		int totalDownloads = aService.getTotalDownloads(null);
 		
 		String totalPaymentAmount = NumberFormat.getNumberInstance(Locale.KOREA).format(money);
-		mv.addObject("userCount", userCount).addObject("templatesCount", templatesCount).addObject("totalPaymentAmount", totalPaymentAmount);
+		mv.addObject("userCount", userCount).addObject("templatesCount", templatesCount).addObject("totalPaymentAmount", totalPaymentAmount).addObject("totalDownloads", totalDownloads);
 		mv.setViewName("dashboard");
 		return mv;
 	}

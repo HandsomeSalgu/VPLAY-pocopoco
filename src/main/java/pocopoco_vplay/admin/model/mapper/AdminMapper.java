@@ -47,4 +47,6 @@ public interface AdminMapper {
 
 	int updateAdmin(HashMap<String, Object> map);
 
+	int getTotalDownloads(Object object);
+
 }

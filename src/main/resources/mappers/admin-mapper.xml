@@ -16,6 +16,11 @@
 	    </if>
 	</select>
 	
+	<select id="getTotalDownloads">
+		SELECT COUNT(*)
+		FROM DOWNLOADS;
+	</select>
+	
 	<select id="getTotalPaymentAmount">
 		SELECT SUM(PAYMENT_AMOUNT) FROM PAYMENT;
 	</select>
