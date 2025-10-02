@@ -19,7 +19,8 @@
 			  <a href="/board/sound-effects-list" class="vplay-nav-link">Sound Effects</a>
 			  <a href="/board/graphic-template-list" class="vplay-nav-link">Graphic Templates</a> 
 			  <a href="/board/stock-video-list" class="vplay-nav-link">Stock Video</a>
-			   <a href="/board/photo-list" class="vplay-nav-link">Photos</a> <a href="/board/font-list" class="vplay-nav-link">Fonts</a>
+			   <a href="/board/photo-list" class="vplay-nav-link">Photos</a> 
+			   <a href="/board/font-list" class="vplay-nav-link">Fonts</a>
 		</nav>
 
 		<div class="vplay-nav-right">
@@ -31,7 +32,9 @@
 						<path d="m3 7l9 6l9-6" /></g></svg> <span id="unreadMessageCount" class="hidden absolute -top-2 -right-2 bg-purple-700 text-white text-xs px-1.5 py-0.5 rounded-full animate-bounce"></span> </svg>
 				</a>
 			</th:block>
-			<a onclick="location.href='/users/license'" class="vplay-nav-link">License</a> <a onclick="location.href='/users/price'" class="vplay-nav-link">Pricing</a>
+			<a th:if="${session.loginUser != null && session.loginUser.isAdmin == 'Y'}" onclick="location.href='/admin/dashboard'" class="vplay-nav-link">관리자</a>
+			<a onclick="location.href='/users/license'" class="vplay-nav-link">License</a>
+			 <a onclick="location.href='/users/price'" class="vplay-nav-link">Pricing</a>
 
 			<th:block th:if="${session.loginUser == null}">
 				<a onclick="location.href='/users/signIn'" class="vplay-nav-link vplay-sign-in">Sign in</a>
